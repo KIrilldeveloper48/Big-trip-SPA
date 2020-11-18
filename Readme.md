@@ -1,7 +1,7 @@
 # Проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Кирилл Попов](https://up.htmlacademy.ru/ecmascript/13/user/1331853).
-* Наставник: `Неизвестно`.
+* Наставник: `Алексей Михеев`.
 
 ---
 
