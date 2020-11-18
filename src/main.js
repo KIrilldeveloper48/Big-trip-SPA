@@ -10,6 +10,8 @@ import {createTripNewPointTemplate} from "./view/main-trip-new-point";
 import {createTripEditPointTemplate} from "./view/main-trip-edit-point";
 import {createTripPointTemplate} from "./view/main-trip-point";
 
+const POINTS_COUNT = 3;
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -58,7 +60,6 @@ const editPointElement = getLastEventsItem();
 render(editPointElement, createTripEditPointTemplate(), `beforeend`);
 
 // Отрисовка точек маршрута
-const POINTS_COUNT = 3;
 
 for (let i = 0; i < POINTS_COUNT; i++) {
   const pointElement = getLastEventsItem();
