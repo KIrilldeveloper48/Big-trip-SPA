@@ -48,16 +48,18 @@ const getTripPointList = () => {
   return tripPointList;
 };
 
+const tripPointsList = getTripPointList();
+
 const siteMainElement = document.querySelector(`.page-body`);
 
 // --- Отрисовка в header ---
 // Отрисовка информации
 const mainHeaderElement = siteMainElement.querySelector(`.trip-main`);
-render(mainHeaderElement, createTripInfoTemplate(getTripPointList()), `afterbegin`);
+render(mainHeaderElement, createTripInfoTemplate(tripPointsList), `afterbegin`);
 
 // Отрисовка цены
 const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-render(tripInfoElement, createTripCostTemplate(), `beforeend`);
+render(tripInfoElement, createTripCostTemplate(tripPointsList), `beforeend`);
 
 // Отрисовка меню и фильтров
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
@@ -88,7 +90,6 @@ const newPointElement = getLastEventsItem();
 render(newPointElement, createTripNewPointTemplate(generateTripPoints()), `beforeend`);
 
 // Отрисовка точек маршрута и формы редактирования
-const tripPointsList = getTripPointList();
 for (let i = 0; i < tripPointsList.length; i++) {
   if (i === 0) {
     const editPointElement = getLastEventsItem();
