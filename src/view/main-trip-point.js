@@ -1,28 +1,63 @@
-export const createTripPointTemplate = () => {
+import dayjs from "dayjs";
+
+// Генерация разметки для выбранных предложений в точке
+const createOffersListTemplate = (offersList) => {
+  if (offersList.length === 0) {
+    return ``;
+  }
+
+  let offersListTemplate = ``;
+  for (let offer of offersList) {
+    if (!offer.checked) {
+      continue;
+    }
+    offersListTemplate += `<li class="event__offer">
+                            <span class="event__offer-title">${offer.name}</span>
+                            &plus;&euro;&nbsp;
+                            <span class="event__offer-price">${offer.cost}</span>
+                          </li>`;
+  }
+  return offersListTemplate;
+};
+
+// Получаем итоговую цену для точки исходя из выбранных предложений
+export const getPointCost = (offersList) => {
+  if (offersList.length === 0) {
+    return 0;
+  }
+
+  let pointCost = 0;
+  for (let offer of offersList) {
+    if (!offer.checked) {
+      continue;
+    }
+    pointCost += offer.cost;
+  }
+  return pointCost;
+};
+
+export const createTripPointTemplate = (serverData) => {
+  const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
   return `<div class="event">
-            <time class="event__date" datetime="2019-03-18">MAR 18</time>
+            <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMMM`)}</time>
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+              <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>
-            <h3 class="event__title">Taxi Amsterdam</h3>
+            <h3 class="event__title">${currentType} ${currentCity}</h3>
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
+                <time class="event__start-time" datetime="${dayjs(startDate).format(`YYYY-M-DD`) + `T` + dayjs(startDate).format(`HH:mm`)}">${dayjs(startDate).format(`HH:mm`)}</time>
                 &mdash;
-                <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+                <time class="event__end-time" datetime="${dayjs(endDate).format(`YYYY-M-DD`) + `T` + dayjs(endDate).format(`HH:mm`)}">${dayjs(endDate).format(`HH:mm`)}</time>
               </p>
-              <p class="event__duration">30M</p>
+              <p class="event__duration">${duration}</p>
             </div>
             <p class="event__price">
-              &euro;&nbsp;<span class="event__price-value">20</span>
+              &euro;&nbsp;<span class="event__price-value">${getPointCost(currentOffers)}</span>
             </p>
             <h4 class="visually-hidden">Offers:</h4>
             <ul class="event__selected-offers">
-              <li class="event__offer">
-                <span class="event__offer-title">Order Uber</span>
-                &plus;&euro;&nbsp;
-                <span class="event__offer-price">20</span>
-              </li>
+              ${createOffersListTemplate(currentOffers)}
             </ul>
             <button class="event__favorite-btn event__favorite-btn--active" type="button">
               <span class="visually-hidden">Add to favorite</span>
