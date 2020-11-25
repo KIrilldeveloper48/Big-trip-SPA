@@ -4,38 +4,15 @@ import {createTripMenuTemplate} from "./view/header-trip-menu";
 import {createTripFiltersTemplate} from "./view/header-trip-filters";
 
 import {createTripSortTemplate} from "./view/main-trip-sort";
-import {createTripListEventsTemplate} from "./view/main-trip-list-events";
-import {createTripListEventsItemTemplate} from "./view/main-trip-list-events";
+import {createTripListEventsTemplate, createTripListEventsItemTemplate} from "./view/main-trip-list-events";
 import {createTripNewPointTemplate} from "./view/main-trip-new-point";
 import {createTripEditPointTemplate} from "./view/main-trip-edit-point";
 import {createTripPointTemplate} from "./view/main-trip-point";
 
+import {SORT_LIST, FILTERS_LIST, MENU_LIST} from './mocks/const';
 import {generateTripPoints} from './mocks/trip-point';
 
-import {SORT_LIST} from './mocks/const';
-import {FILTERS_LIST} from './mocks/const';
-import {MENU_LIST} from './mocks/const';
-
 const POINTS_COUNT = 20;
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
-// Сортировка точек маршрута по дате
-const sortTripPointList = (list) => {
-  const sortList = (a, b) => {
-    if (a.startDate.getTime() > b.startDate.getTime()) {
-      return 1;
-    }
-    if (a.startDate.getTime() < b.startDate.getTime()) {
-      return -1;
-    }
-    return 0;
-  };
-
-  return list.sort(sortList);
-};
 
 // Получаем массив с точками маршрута
 const getTripPointList = () => {
@@ -43,23 +20,40 @@ const getTripPointList = () => {
   for (let i = 0; i < POINTS_COUNT; i++) {
     tripPointList.push(generateTripPoints());
   }
-  tripPointList = sortTripPointList(tripPointList);
 
   return tripPointList;
 };
 
 const tripPointsList = getTripPointList();
 
+// Сортировка точек маршрута по дате
+const getSortList = (a, b) => {
+  return a.startDate.getTime() - b.startDate.getTime();
+};
+
+const getTripPointListSort = () => {
+  const tripPointListCopy = tripPointsList.slice();
+  return tripPointListCopy.sort(getSortList);
+};
+
+const tripPointListSort = getTripPointListSort();
+
+
+// --- Рендер ---
+const render = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
 const siteMainElement = document.querySelector(`.page-body`);
 
 // --- Отрисовка в header ---
 // Отрисовка информации
 const mainHeaderElement = siteMainElement.querySelector(`.trip-main`);
-render(mainHeaderElement, createTripInfoTemplate(tripPointsList), `afterbegin`);
+render(mainHeaderElement, createTripInfoTemplate(tripPointListSort), `afterbegin`);
 
 // Отрисовка цены
 const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-render(tripInfoElement, createTripCostTemplate(tripPointsList), `beforeend`);
+render(tripInfoElement, createTripCostTemplate(tripPointListSort), `beforeend`);
 
 // Отрисовка меню и фильтров
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
@@ -93,9 +87,9 @@ render(newPointElement, createTripNewPointTemplate(generateTripPoints()), `befor
 for (let i = 0; i < tripPointsList.length; i++) {
   if (i === 0) {
     const editPointElement = getLastEventsItem();
-    render(editPointElement, createTripEditPointTemplate(tripPointsList[i]), `beforeend`);
+    render(editPointElement, createTripEditPointTemplate(tripPointListSort[i]), `beforeend`);
     continue;
   }
   const pointElement = getLastEventsItem();
-  render(pointElement, createTripPointTemplate(tripPointsList[i]), `beforeend`);
+  render(pointElement, createTripPointTemplate(tripPointListSort[i]), `beforeend`);
 }
