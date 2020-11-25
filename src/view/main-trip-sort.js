@@ -1,13 +1,16 @@
+import {SortListDisable} from '../mocks/const';
+
 // Генерация разметки для типов сортировки точек
 const generateSortListTemplate = (sortList) => {
-  let sortListTemplate = ``;
-  for (let type of sortList) {
-    sortListTemplate += `<div class="trip-sort__item  trip-sort__item--${type.toLowerCase()}">
-              <input id="sort-${type.toLowerCase()}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${type.toLowerCase()}">
-              <label class="trip-sort__btn" for="sort-${type.toLowerCase()}">${type}</label>
-            </div>`;
-  }
-  return sortListTemplate;
+
+  return sortList.reduce((result, type) => {
+    result += `<div class="trip-sort__item  trip-sort__item--${type.toLowerCase()}">
+                <input ${type === SortListDisable.EVENT || type === SortListDisable.OFFERS ? `disabled` : ``} id="sort-${type.toLowerCase()}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${type.toLowerCase()}">
+                <label class="trip-sort__btn" for="sort-${type.toLowerCase()}">${type}</label>
+              </div>`;
+    return result;
+  }, ``);
+
 };
 
 export const createTripSortTemplate = (serverData) => {
