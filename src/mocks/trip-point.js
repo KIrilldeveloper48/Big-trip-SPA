@@ -6,15 +6,13 @@ import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_
 // Генерация описания для точки
 const generatePointDescr = () => {
   const {MIN: min, MAX: max} = SentenceCount;
-  const circleCount = getRandomInteger(min, max);
-
   const possiblePointDescr = POINT_DESCR.split(`.`);
 
   let pointDescr = ``;
 
-  for (let i = 0; i < circleCount; i++) {
+  for (let i = 0; i < getRandomInteger(min, max); i++) {
     // possiblePointDescr.length - 2 нужен потому, что метод split разделяя элементы по точке создаёт один пустой элемент в конце массива,
-    // т.к.последнее предложение заканчивается точкой
+    // т.к. последнее предложение заканчивается точкой
     pointDescr += possiblePointDescr[getRandomInteger(0, possiblePointDescr.length - 2)].trim() + `. `;
   }
 
