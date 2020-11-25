@@ -1,4 +1,7 @@
-export const createTripNewPointTemplate = () => {
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from './main-trip-edit-point';
+
+export const createTripNewPointTemplate = (serverData) => {
+  const {typesList, citiesList, offersList} = serverData;
   return `
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">
@@ -12,56 +15,7 @@ export const createTripNewPointTemplate = () => {
               <div class="event__type-list">
                 <fieldset class="event__type-group">
                   <legend class="visually-hidden">Event type</legend>
-
-                  <div class="event__type-item">
-                    <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                    <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                    <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                    <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                    <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-                    <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                    <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                    <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                    <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                    <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-                  </div>
-
-                  <div class="event__type-item">
-                    <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                    <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-                  </div>
+                 ${generateTypesListTemplate(typesList)}
                 </fieldset>
               </div>
             </div>
@@ -72,9 +26,7 @@ export const createTripNewPointTemplate = () => {
               </label>
               <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
               <datalist id="destination-list-1">
-                <option value="Amsterdam"></option>
-                <option value="Geneva"></option>
-                <option value="Chamonix"></option>
+               ${generateCitiesListTemplate(citiesList)}
               </datalist>
             </div>
 
@@ -98,60 +50,13 @@ export const createTripNewPointTemplate = () => {
             <button class="event__reset-btn" type="reset">Cancel</button>
           </header>
           <section class="event__details">
-            <section class="event__section  event__section--offers">
-              <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-              <div class="event__available-offers">
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-                  <label class="event__offer-label" for="event-offer-luggage-1">
-                    <span class="event__offer-title">Add luggage</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">30</span>
-                  </label>
-                </div>
-
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" checked>
-                  <label class="event__offer-label" for="event-offer-comfort-1">
-                    <span class="event__offer-title">Switch to comfort class</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">100</span>
-                  </label>
-                </div>
-
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-meal-1" type="checkbox" name="event-offer-meal">
-                  <label class="event__offer-label" for="event-offer-meal-1">
-                    <span class="event__offer-title">Add meal</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">15</span>
-                  </label>
-                </div>
-
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-seats-1" type="checkbox" name="event-offer-seats">
-                  <label class="event__offer-label" for="event-offer-seats-1">
-                    <span class="event__offer-title">Choose seats</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">5</span>
-                  </label>
-                </div>
-
-                <div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-train-1" type="checkbox" name="event-offer-train">
-                  <label class="event__offer-label" for="event-offer-train-1">
-                    <span class="event__offer-title">Travel by train</span>
-                    &plus;&euro;&nbsp;
-                    <span class="event__offer-price">40</span>
-                  </label>
-                </div>
-              </div>
-            </section>
-
+            ${generateOffersListTemplate(offersList[`Flight`])}
+            
             <section class="event__section  event__section--destination">
               <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-              <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+              <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern
+                tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has
+                views of dramatic Mont Blanc.</p>
 
               <div class="event__photos-container">
                 <div class="event__photos-tape">
