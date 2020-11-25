@@ -1,10 +1,9 @@
 // Генерация разметки для меню
 const generateMenuListTemplate = (menulist) => {
-  let menuListTemplate = ``;
-  for (let menuItem of menulist) {
-    menuListTemplate += ` <a class="trip-tabs__btn" href="#">${menuItem}</a>`;
-  }
-  return menuListTemplate;
+  return menulist.reduce((result, menuItem) => {
+    result += ` <a class="trip-tabs__btn" href="#">${menuItem}</a>`;
+    return result;
+  }, ``);
 };
 
 export const createTripMenuTemplate = (serverData) => {
