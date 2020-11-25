@@ -1,13 +1,14 @@
 // Получаем итоговую цену путешествия
 const getTripCost = (pointsList) => {
   let tripCost = 0;
-  for (let point of pointsList) {
-    for (let offer of point.currentOffers) {
+  pointsList.forEach((point) => {
+    point.currentOffers.forEach((offer) => {
       if (offer.checked) {
         tripCost += offer.cost;
       }
-    }
-  }
+    });
+  });
+
   return tripCost;
 };
 
