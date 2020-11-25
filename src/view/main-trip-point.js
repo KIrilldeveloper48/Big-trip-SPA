@@ -6,18 +6,16 @@ const createOffersListTemplate = (offersList) => {
     return ``;
   }
 
-  let offersListTemplate = ``;
-  for (let offer of offersList) {
-    if (!offer.checked) {
-      continue;
+  return offersList.reduce((result, offer) => {
+    if (offer.checked) {
+      result += `<li class="event__offer">
+                  <span class="event__offer-title">${offer.name}</span>
+                  &plus;&euro;&nbsp;
+                  <span class="event__offer-price">${offer.cost}</span>
+                </li>`;
     }
-    offersListTemplate += `<li class="event__offer">
-                            <span class="event__offer-title">${offer.name}</span>
-                            &plus;&euro;&nbsp;
-                            <span class="event__offer-price">${offer.cost}</span>
-                          </li>`;
-  }
-  return offersListTemplate;
+    return result;
+  }, ``);
 };
 
 // Получаем итоговую цену для точки исходя из выбранных предложений
@@ -27,19 +25,19 @@ export const getPointCost = (offersList) => {
   }
 
   let pointCost = 0;
-  for (let offer of offersList) {
-    if (!offer.checked) {
-      continue;
+  offersList.forEach((offer) => {
+    if (offer.checked) {
+      pointCost += offer.cost;
     }
-    pointCost += offer.cost;
-  }
+  });
+
   return pointCost;
 };
 
 export const createTripPointTemplate = (serverData) => {
   const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
   return `<div class="event">
-            <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMMM`)}</time>
+            <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMM`)}</time>
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>
