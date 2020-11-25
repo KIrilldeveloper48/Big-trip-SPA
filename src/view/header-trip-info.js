@@ -8,15 +8,14 @@ const getTitleInfo = (pointsList) => {
     return `${pointsList[0].currentCity} &mdash; ... &mdash; ${pointsList[pointsList.length - 1].currentCity}`;
   }
 
-  let titleInfo = ``;
-  for (let point of pointsList) {
+  return pointsList.reduce((result, point) => {
     if (point !== pointsList[pointsList.length - 1]) {
-      titleInfo += `${point.currentCity} &mdash;`;
+      result += `${point.currentCity} &mdash;`;
     } else {
-      titleInfo += `${point.currentCity}`;
+      result += `${point.currentCity}`;
     }
-  }
-  return titleInfo;
+    return result;
+  }, ``);
 };
 
 // Получаем дату начала и окончания путешествия
