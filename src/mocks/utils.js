@@ -5,3 +5,9 @@ export const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
+export const getRandomItem = (items) => {
+  if (items.length === 0) {
+    return [];
+  }
+  return items[getRandomInteger(0, items.length - 1)];
+};
