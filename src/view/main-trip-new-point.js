@@ -1,6 +1,4 @@
-import {generateTypesListTemplate} from './main-trip-edit-point';
-import {generateCitiesListTemplate} from './main-trip-edit-point';
-import {generateOffersListTemplate} from './main-trip-edit-point';
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from './main-trip-edit-point';
 
 export const createTripNewPointTemplate = (serverData) => {
   const {typesList, citiesList, offersList} = serverData;
