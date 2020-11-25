@@ -1,41 +1,21 @@
-import {getRandomInteger} from './utils';
-import {TRIP_POINTS_TYPES} from './const';
+import {getRandomInteger, getRandomItem} from './utils';
+import {OptionsCount, PossibleCost, POSSIBLE_NAME, TRIP_POINTS_TYPES} from './const';
 
 const generateListPointOffer = () => {
-  const possibleCost = {
-    min: 5,
-    max: 100
-  };
+  const {MIN: minCount, MAX: maxCount} = OptionsCount;
+  const {MIN: minCost, MAX: maxCost} = PossibleCost;
 
-  const possibleName = [
-    `Order Uber`,
-    `Add luggage`,
-    `Switch to comfort`,
-    `Rent a car`,
-    `Add breakfast`,
-    `Book tickets`,
-    `Lunch in city`,
-    `Rent a boat`,
-    `feed the pigeons`,
-    `Enjoy the view`
-  ];
+  const offersList = [];
 
-  const optionsCount = {
-    min: 0,
-    max: 5
-  };
-
-  const listOffers = [];
-
-  for (let i = 0; i < getRandomInteger(optionsCount.min, optionsCount.max); i++) {
+  for (let i = 0; i < getRandomInteger(minCount, maxCount); i++) {
     const randomOffer = {
-      name: possibleName[getRandomInteger(0, possibleName.length - 1)],
-      cost: getRandomInteger(possibleCost.min, possibleCost.max),
+      name: getRandomItem(POSSIBLE_NAME),
+      cost: getRandomInteger(minCost, maxCost),
     };
-    listOffers.push(randomOffer);
+    offersList.push(randomOffer);
   }
 
-  return listOffers;
+  return offersList;
 };
 
 export const getPointOffers = () => {
