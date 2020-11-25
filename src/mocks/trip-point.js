@@ -1,22 +1,20 @@
 import dayjs from 'dayjs';
 import {getRandomInteger} from './utils';
 
-import {TRIP_POINTS_TYPES} from './const';
-import {CITIES_LIST} from './const';
-import {OFFERS_LIST} from './const';
-import {POINT_DESCR} from './const';
+import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount} from './const';
 
 // Генерация описания для точки
 const generatePointDescr = () => {
+  const {MIN: min, MAX: max} = SentenceCount;
+  const circleCount = getRandomInteger(min, max);
+
   const possiblePointDescr = POINT_DESCR.split(`.`);
-  const sentenceCount = {
-    min: 1,
-    max: 5
-  };
-  const circleCount = getRandomInteger(sentenceCount.min, sentenceCount.max);
+
   let pointDescr = ``;
 
   for (let i = 0; i < circleCount; i++) {
+    // possiblePointDescr.length - 2 нужен потому, что метод split разделяя элементы по точке создаёт один пустой элемент в конце массива,
+    // т.к.последнее предложение заканчивается точкой
     pointDescr += possiblePointDescr[getRandomInteger(0, possiblePointDescr.length - 2)].trim() + `. `;
   }
 
@@ -25,15 +23,14 @@ const generatePointDescr = () => {
 
 // Генерация списка фотографий для точки
 const generatePointPhotos = () => {
-  const photoCount = {
-    min: 1,
-    max: 5
-  };
+  const {MIN: min, MAX: max} = PhotoCount;
   const pointPhotos = [];
-  for (let i = 0; i < getRandomInteger(photoCount.min, photoCount.max); i++) {
+
+  for (let i = 0; i < getRandomInteger(min, max); i++) {
     const photoPath = `http://picsum.photos/248/152?r=${Math.random()}`;
     pointPhotos.push(photoPath);
   }
+
   return pointPhotos;
 };
 
@@ -43,6 +40,7 @@ const getCurrentOffers = (currentType) => {
     return [];
   }
   let currentOffers = [];
+
   for (let offer of OFFERS_LIST[currentType]) {
     currentOffers.push({
       name: offer.name,
@@ -50,15 +48,14 @@ const getCurrentOffers = (currentType) => {
       checked: getRandomInteger(0, 1)});
   }
 
-
   return currentOffers;
 };
 
 // Генерация стартовой даты
 const generateStartDate = () => {
   const maxHoursGap = 30 * 24;
-  const daysGap = getRandomInteger(0, maxHoursGap);
-  return dayjs().add(daysGap, `hour`).toDate();
+  const hoursGap = getRandomInteger(0, maxHoursGap);
+  return dayjs().add(hoursGap, `hour`).toDate();
 };
 
 // Генерация конечной даты
@@ -70,14 +67,11 @@ const generateEndDate = (startDate) => {
 
 // Вычисление продолжительности нахождения в точке
 const getTripPointDuration = (startDate, endDate) => {
-  const mlsecondsPerMinute = 1000 * 60;
-  const minutesPerDay = 1440;
-  const minutesPerHour = 60;
+  const durationInMinutes = (endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE;
 
-  const durationInMinutes = (endDate.getTime() - startDate.getTime()) / mlsecondsPerMinute;
-  const numberOfDays = Math.floor(durationInMinutes / minutesPerDay);
-  const numberOfHours = Math.floor((durationInMinutes - (numberOfDays * minutesPerDay)) / minutesPerHour);
-  const numberOfMinutes = durationInMinutes - (numberOfDays * minutesPerDay + numberOfHours * minutesPerHour);
+  const numberOfDays = Math.floor(durationInMinutes / MINUTES_PER_DAY);
+  const numberOfHours = Math.floor((durationInMinutes - (numberOfDays * MINUTES_PER_DAY)) / MINUTES_PER_HOUR);
+  const numberOfMinutes = durationInMinutes - (numberOfDays * MINUTES_PER_DAY + numberOfHours * MINUTES_PER_HOUR);
 
   let tripPointDuration = `${numberOfMinutes}M`;
 
