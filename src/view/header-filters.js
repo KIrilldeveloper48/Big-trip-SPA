@@ -1,3 +1,5 @@
+import {createElement} from "../utils";
+
 // Генерация разметки для фильтрации точек
 const generateFiltersListTemplate = (filtersList) => {
 
@@ -11,11 +13,37 @@ const generateFiltersListTemplate = (filtersList) => {
 
 };
 
-export const createTripFiltersTemplate = (serverData) => {
-  return `<h2 class="visually-hidden">Filter events</h2>
-          <form class="trip-filters" action="#" method="get">
+const createFiltersTemplate = (serverData) => {
+  return `<form class="trip-filters" action="#" method="get">
             ${generateFiltersListTemplate(serverData)}
 
             <button class="visually-hidden" type="submit">Accept filter</button>
           </form>`;
 };
+
+export default class Filters {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+    this._header = `<h2 class="visually-hidden">Filter events</h2>`;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  getHeader() {
+    return createElement(this._header);
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

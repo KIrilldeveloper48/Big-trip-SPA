@@ -1,8 +1,9 @@
-import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from './main-trip-edit-point';
+import {createElement} from "../utils";
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
-export const createTripNewPointTemplate = (serverData) => {
+export const createNewPointTemplate = (serverData) => {
   const {typesList, citiesList, offersList} = serverData;
-  return `
+  return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">
             <div class="event__type-wrapper">
@@ -69,5 +70,28 @@ export const createTripNewPointTemplate = (serverData) => {
               </div>
             </section>
           </section>
-        </form>`;
+        </form>
+      </li>`;
 };
+
+export default class NewPoint {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+  }
+
+  getTemplate() {
+    return createNewPointTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

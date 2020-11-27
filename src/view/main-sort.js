@@ -1,3 +1,5 @@
+import {createElement} from "../utils";
+
 import {SortListDisable} from '../mocks/const';
 
 // Генерация разметки для типов сортировки точек
@@ -13,10 +15,35 @@ const generateSortListTemplate = (sortList) => {
 
 };
 
-export const createTripSortTemplate = (serverData) => {
-  return `<h2 class="visually-hidden">Trip events</h2>
-
-          <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
+const createSortTemplate = (serverData) => {
+  return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
            ${generateSortListTemplate(serverData)}
           </form>`;
 };
+
+export default class Sort {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+    this._header = `<h2 class="visually-hidden">Trip events</h2>`;
+  }
+
+  getTemplate() {
+    return createSortTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  getHeader() {
+    return createElement(this._header);
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

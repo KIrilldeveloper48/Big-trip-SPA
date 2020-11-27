@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+import {createElement} from "../utils";
+import {getPointCost} from "./common-template";
+
 
 // Генерация разметки для выбранных предложений в точке
 const createOffersListTemplate = (offersList) => {
@@ -18,25 +21,11 @@ const createOffersListTemplate = (offersList) => {
   }, ``);
 };
 
-// Получаем итоговую цену для точки исходя из выбранных предложений
-export const getPointCost = (offersList) => {
-  if (offersList.length === 0) {
-    return 0;
-  }
 
-  let pointCost = 0;
-  offersList.forEach((offer) => {
-    if (offer.checked) {
-      pointCost += offer.cost;
-    }
-  });
-
-  return pointCost;
-};
-
-export const createTripPointTemplate = (serverData) => {
+export const createPointTemplate = (serverData) => {
   const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
-  return `<div class="event">
+  return `<li class="trip-events__item">
+          <div class="event">
             <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMM`)}</time>
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
@@ -66,5 +55,28 @@ export const createTripPointTemplate = (serverData) => {
             <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
             </button>
-          </div>`;
+          </div>
+          </li>`;
 };
+
+export default class Point {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
