@@ -40,7 +40,7 @@ const tripPointListSort = getTripPointListSort();
 
 
 // --- Рендер ---
-const render = (container, template, place) => {
+const render = (container, template, place = `beforeend`) => {
   container.insertAdjacentHTML(place, template);
 };
 
@@ -53,43 +53,39 @@ render(mainHeaderElement, createTripInfoTemplate(tripPointListSort), `afterbegin
 
 // Отрисовка цены
 const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-render(tripInfoElement, createTripCostTemplate(tripPointListSort), `beforeend`);
+render(tripInfoElement, createTripCostTemplate(tripPointListSort));
 
 // Отрисовка меню и фильтров
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
 render(tripControlsElement, createTripMenuTemplate(MENU_LIST), `afterbegin`);
-render(tripControlsElement, createTripFiltersTemplate(FILTERS_LIST), `beforeend`);
+render(tripControlsElement, createTripFiltersTemplate(FILTERS_LIST));
 
 // --- Отрисовка в main ---
 // Отрисовка сортировки и списка (ul)
 const tripEventsElement = siteMainElement.querySelector(`.trip-events`);
 render(tripEventsElement, createTripSortTemplate(SORT_LIST), `afterbegin`);
-render(tripEventsElement, createTripListEventsTemplate(), `beforeend`);
+render(tripEventsElement, createTripListEventsTemplate());
 
 // Нахождение последнего элемента li в списке для вставки в него контента
 const tripListEventsElement = tripEventsElement.querySelector(
     `.trip-events__list`
 );
 const getLastEventsItem = () => {
-  render(
-      tripListEventsElement,
-      createTripListEventsItemTemplate(),
-      `beforeend`
-  );
+  render(tripListEventsElement, createTripListEventsItemTemplate());
   return tripListEventsElement.lastChild;
 };
 
 // Отрисовка формы создания точки маршрута
 const newPointElement = getLastEventsItem();
-render(newPointElement, createTripNewPointTemplate(generateTripPoints()), `beforeend`);
+render(newPointElement, createTripNewPointTemplate(generateTripPoints()));
 
 // Отрисовка точек маршрута и формы редактирования
 for (let i = 0; i < tripPointsList.length; i++) {
   if (i === 0) {
     const editPointElement = getLastEventsItem();
-    render(editPointElement, createTripEditPointTemplate(tripPointListSort[i]), `beforeend`);
+    render(editPointElement, createTripEditPointTemplate(tripPointListSort[i]));
     continue;
   }
   const pointElement = getLastEventsItem();
-  render(pointElement, createTripPointTemplate(tripPointListSort[i]), `beforeend`);
+  render(pointElement, createTripPointTemplate(tripPointListSort[i]));
 }
