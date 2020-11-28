@@ -7,11 +7,14 @@ import EventsListContainer from "./view/main-list-events";
 // import NewPointView from "./view/main-new-point";
 import PointEditView from "./view/main-edit-point";
 import PointView from "./view/main-point";
+import HiddenHeader from './view/hidden-header';
 
 import {SORT_LIST, FILTERS_LIST, MENU_LIST} from './mocks/const';
 import {generateTripPoints} from './mocks/trip-point';
 
 import {render, RenderPosition} from './utils';
+import {HiddenHeaderList, Keys} from './const';
+
 
 const POINTS_COUNT = 20;
 
@@ -39,6 +42,7 @@ const getPointListSort = () => {
 // --- Отрисовка ---
 const pointsList = getPointList();
 const pointListSort = getPointListSort();
+const {FILTERS: filterHeader, MENU: menuHeader, SORT: sortHeader} = HiddenHeaderList;
 
 const siteMainElement = document.querySelector(`.page-body`);
 
@@ -55,40 +59,46 @@ const renderHeader = () => {
   // Отрисовка меню и фильтров
   const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
   render(tripControlsElement, new MenuView(MENU_LIST).getElement(), RenderPosition.AFTERBEGIN);
-  render(tripControlsElement, new MenuView().getHeader(), RenderPosition.AFTERBEGIN);
+  render(tripControlsElement, new HiddenHeader(menuHeader).getElement(), RenderPosition.AFTERBEGIN);
 
-  render(tripControlsElement, new FiltersView().getHeader(), RenderPosition.BEFOREEND);
+  render(tripControlsElement, new HiddenHeader(filterHeader).getElement(), RenderPosition.BEFOREEND);
   render(tripControlsElement, new FiltersView(FILTERS_LIST).getElement(), RenderPosition.BEFOREEND);
+
+
 };
 
 // --- Отрисовка в main ---
+const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 // Логика для отрисовки точек маршрута и формы редактирования
 const renderPoint = (container, point) => {
   const pointComponent = new PointView(point);
   const pointEditComponent = new PointEditView(point);
 
+  const pointComponentElement = pointComponent.getElement();
+  const pointEditComponentElement = pointEditComponent.getElement();
+
   const replacePointToForm = () => {
-    container.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
+    container.replaceChild(pointEditComponentElement, pointComponentElement);
   };
   const replaceFormToPoint = () => {
-    container.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
+    container.replaceChild(pointComponentElement, pointEditComponentElement);
 
   };
 
   const onEscKeyDown = (evt) => {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === escapeKey || evt.key === escKey) {
       evt.preventDefault();
       replaceFormToPoint();
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
 
-  pointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  pointComponentElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
     replacePointToForm();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  pointEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
+  pointEditComponentElement.querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceFormToPoint();
     document.removeEventListener(`keydown`, onEscKeyDown);
@@ -101,16 +111,19 @@ const renderContent = () => {
   // Отрисовка сортировки
   const tripEventsElement = siteMainElement.querySelector(`.trip-events`);
   render(tripEventsElement, new SortView(SORT_LIST).getElement(), RenderPosition.AFTERBEGIN);
-  render(tripEventsElement, new SortView().getHeader(), RenderPosition.AFTERBEGIN);
+  render(tripEventsElement, new HiddenHeader(sortHeader).getElement(), RenderPosition.AFTERBEGIN);
 
   // Добавление контейнера (ul) для точек и форм
-  render(tripEventsElement, new EventsListContainer().getElement(), RenderPosition.BEFOREEND);
-  const eventsElementList = tripEventsElement.querySelector(`.trip-events__list`);
+  const eventsList = new EventsListContainer();
+  const eventsListElement = eventsList.getElement();
+  render(tripEventsElement, eventsListElement, RenderPosition.BEFOREEND);
+
   // Отрисовка формы создания точки маршрута
   // render(eventsElementList, new NewPointView(generateTripPoints()).getElement(), RenderPosition.BEFOREEND);
+
   // Отрисовка точек
   for (let i = 0; i < pointsList.length; i++) {
-    renderPoint(eventsElementList, pointListSort[i]);
+    renderPoint(eventsListElement, pointListSort[i]);
   }
 };
 
