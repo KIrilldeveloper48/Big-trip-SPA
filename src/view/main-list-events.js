@@ -4,7 +4,7 @@ const createListEventsTemplate = () => {
   return `<ul class="trip-events__list"></ul>`;
 };
 
-export default class EventsListContainer {
+class EventsListContainer {
   constructor(data) {
     this._element = null;
     this._data = data;
@@ -25,3 +25,5 @@ export default class EventsListContainer {
     this._element = null;
   }
 }
+
+export default EventsListContainer;

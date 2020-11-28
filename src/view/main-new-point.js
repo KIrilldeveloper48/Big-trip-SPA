@@ -74,7 +74,7 @@ export const createNewPointTemplate = (serverData) => {
       </li>`;
 };
 
-export default class NewPoint {
+class NewPoint {
   constructor(data) {
     this._element = null;
     this._data = data;
@@ -95,3 +95,5 @@ export default class NewPoint {
     this._element = null;
   }
 }
+
+export default NewPoint;

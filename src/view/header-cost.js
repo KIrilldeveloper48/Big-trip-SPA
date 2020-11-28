@@ -20,7 +20,7 @@ const createTripCostTemplate = (serverData) => {
           </p>`;
 };
 
-export default class TripCost {
+class TripCost {
   constructor(data) {
     this._element = null;
     this._data = data;
@@ -41,3 +41,5 @@ export default class TripCost {
     this._element = null;
   }
 }
+
+export default TripCost;
