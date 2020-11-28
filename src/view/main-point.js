@@ -1,5 +1,4 @@
-import dayjs from "dayjs";
-import {createElement} from "../utils";
+import {createElement, getFormatedDate} from "../utils";
 import {getPointCost} from "./common-template";
 
 
@@ -24,18 +23,23 @@ const createOffersListTemplate = (offersList) => {
 
 export const createPointTemplate = (serverData) => {
   const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
+  const fullStartDate = getFormatedDate(startDate, `YYYY-M-DD`);
+  const timeStartDate = getFormatedDate(startDate, `HH:mm`);
+  const fullEndDate = getFormatedDate(endDate, `YYYY-M-DD`);
+  const timeEndDate = getFormatedDate(endDate, `HH:mm`);
+
   return `<li class="trip-events__item">
           <div class="event">
-            <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMM`)}</time>
+            <time class="event__date" datetime="${fullStartDate}">${getFormatedDate(startDate, `D MMM`)}</time>
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>
             <h3 class="event__title">${currentType} ${currentCity}</h3>
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="${dayjs(startDate).format(`YYYY-M-DD`) + `T` + dayjs(startDate).format(`HH:mm`)}">${dayjs(startDate).format(`HH:mm`)}</time>
+                <time class="event__start-time" datetime="${fullStartDate + `T` + timeStartDate}">${timeStartDate}</time>
                 &mdash;
-                <time class="event__end-time" datetime="${dayjs(endDate).format(`YYYY-M-DD`) + `T` + dayjs(endDate).format(`HH:mm`)}">${dayjs(endDate).format(`HH:mm`)}</time>
+                <time class="event__end-time" datetime="${fullEndDate + `T` + timeEndDate}">${timeEndDate}</time>
               </p>
               <p class="event__duration">${duration}</p>
             </div>
@@ -59,7 +63,7 @@ export const createPointTemplate = (serverData) => {
           </li>`;
 };
 
-export default class Point {
+class Point {
   constructor(data) {
     this._element = null;
     this._data = data;
@@ -80,3 +84,5 @@ export default class Point {
     this._element = null;
   }
 }
+
+export default Point;
