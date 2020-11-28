@@ -1,5 +1,4 @@
-import dayjs from 'dayjs';
-import {createElement} from "../utils";
+import {createElement, getFormatedDate} from "../utils";
 import {getPointCost, generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
 // Генерация разметки для описания точки
@@ -8,7 +7,7 @@ const generateDestinationTemplate = (photos, descr) => {
     return ``;
   }
 
-  let photosList = photos.reduce((result, photo) => {
+  const photosList = photos.reduce((result, photo) => {
     result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
     return result;
   }, ``);
@@ -56,10 +55,10 @@ const createEditPointTemplate = (serverData) => {
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(startDate).format(`DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, `DD/MM/YY HH:mm`)}">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(endDate).format(`DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, `DD/MM/YY HH:mm`)}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -85,7 +84,7 @@ const createEditPointTemplate = (serverData) => {
         </li>`;
 };
 
-export default class EditPoint {
+class EditPoint {
   constructor(data) {
     this._element = null;
     this._data = data;
@@ -106,3 +105,5 @@ export default class EditPoint {
     this._element = null;
   }
 }
+
+export default EditPoint;
