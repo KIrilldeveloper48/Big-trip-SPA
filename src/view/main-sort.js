@@ -6,9 +6,13 @@ import {SortListDisable} from '../mocks/const';
 const generateSortListTemplate = (sortList) => {
 
   return sortList.reduce((result, type) => {
-    result += `<div class="trip-sort__item  trip-sort__item--${type.toLowerCase()}">
-                <input ${type === SortListDisable.EVENT || type === SortListDisable.OFFERS ? `disabled` : ``} id="sort-${type.toLowerCase()}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${type.toLowerCase()}">
-                <label class="trip-sort__btn" for="sort-${type.toLowerCase()}">${type}</label>
+    const typeLowerCase = type.toLowerCase();
+    const isDisabled = type === SortListDisable.EVENT || type === SortListDisable.OFFERS ? `disabled` : ``;
+
+    result += `<div class="trip-sort__item  trip-sort__item--${typeLowerCase}">
+                <input ${isDisabled} id="sort-${typeLowerCase}" 
+                class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${typeLowerCase}">
+                <label class="trip-sort__btn" for="sort-${typeLowerCase}">${type}</label>
               </div>`;
     return result;
   }, ``);
@@ -21,11 +25,10 @@ const createSortTemplate = (serverData) => {
           </form>`;
 };
 
-export default class Sort {
+class Sort {
   constructor(data) {
     this._element = null;
     this._data = data;
-    this._header = `<h2 class="visually-hidden">Trip events</h2>`;
   }
 
   getTemplate() {
@@ -39,11 +42,9 @@ export default class Sort {
     return this._element;
   }
 
-  getHeader() {
-    return createElement(this._header);
-  }
-
   removeElement() {
     this._element = null;
   }
 }
+
+export default Sort;
