@@ -1,68 +1,13 @@
-import dayjs from 'dayjs';
-import {getPointCost} from './main-trip-point';
-
-// Генерация разметки для списка с типом путешествия
-export const generateTypesListTemplate = (typesList) => {
-  return typesList.reduce((result, type) => {
-    result += `<div class="event__type-item">
-                  <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}">
-                  <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
-                </div>`;
-    return result;
-  }, ``);
-};
-
-// Генерация разметки для списка городов
-export const generateCitiesListTemplate = (citiesList) => {
-  return citiesList.reduce((result, city) => {
-    result += `<option value="${city}"></option>`;
-    return result;
-  }, ``);
-};
-
-// Генерация разметки для списка доступных доп. опций конкретной точки
-export const generateOffersListTemplate = (offersList) => {
-  if (offersList.length === 0) {
-    return ``;
-  }
-
-  let offersListTemplate = offersList.reduce((result, offer) => {
-    let offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
-                                    id="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1" type="checkbox" 
-                                    name="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}">`;
-
-    if (offer.checked) {
-      offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
-                                  id="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1" type="checkbox" 
-                                  name="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}" checked>`;
-    }
-
-    result += `<div class="event__offer-selector">
-                ${offersListInputTemplate}
-                <label class="event__offer-label" for="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1">
-                  <span class="event__offer-title">${offer.name}</span>
-                  &plus;&euro;&nbsp;
-                  <span class="event__offer-price">${offer.cost}</span>
-                </label>
-              </div>`;
-    return result;
-  }, ``);
-
-  return `<section class="event__section  event__section--offers">
-            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-            <div class="event__available-offers">
-              ${offersListTemplate}
-            </div>
-          </section>`;
-};
+import {createElement, getFormatedDate} from "../utils";
+import {getPointCost, generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
 // Генерация разметки для описания точки
-export const generateDestinationTemplate = (photos, descr) => {
+const generateDestinationTemplate = (photos, descr) => {
   if (photos.length === 0 && descr.length === 0) {
     return ``;
   }
 
-  let photosList = photos.reduce((result, photo) => {
+  const photosList = photos.reduce((result, photo) => {
     result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
     return result;
   }, ``);
@@ -78,9 +23,10 @@ export const generateDestinationTemplate = (photos, descr) => {
           </section>`;
 };
 
-export const createTripEditPointTemplate = (serverData) => {
+const createEditPointTemplate = (serverData) => {
   const {typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate} = serverData;
-  return `<form class="event event--edit" action="#" method="post">
+  return `<li class="trip-events__item">
+            <form class="event event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -109,10 +55,10 @@ export const createTripEditPointTemplate = (serverData) => {
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(startDate).format(`DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, `DD/MM/YY HH:mm`)}">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(endDate).format(`DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, `DD/MM/YY HH:mm`)}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -134,5 +80,30 @@ export const createTripEditPointTemplate = (serverData) => {
  
             ${generateDestinationTemplate(photosList, descr)}
             </section>
-          </form>`;
+          </form>
+        </li>`;
 };
+
+class EditPoint {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+  }
+
+  getTemplate() {
+    return createEditPointTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EditPoint;

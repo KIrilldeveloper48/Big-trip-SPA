@@ -1,4 +1,6 @@
-import dayjs from "dayjs";
+import {createElement, getFormatedDate} from "../utils";
+import {getPointCost} from "./common-template";
+
 
 // Генерация разметки для выбранных предложений в точке
 const createOffersListTemplate = (offersList) => {
@@ -18,35 +20,26 @@ const createOffersListTemplate = (offersList) => {
   }, ``);
 };
 
-// Получаем итоговую цену для точки исходя из выбранных предложений
-export const getPointCost = (offersList) => {
-  if (offersList.length === 0) {
-    return 0;
-  }
 
-  let pointCost = 0;
-  offersList.forEach((offer) => {
-    if (offer.checked) {
-      pointCost += offer.cost;
-    }
-  });
-
-  return pointCost;
-};
-
-export const createTripPointTemplate = (serverData) => {
+export const createPointTemplate = (serverData) => {
   const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
-  return `<div class="event">
-            <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-M-DD`)}">${dayjs(startDate).format(`D MMM`)}</time>
+  const fullStartDate = getFormatedDate(startDate, `YYYY-M-DD`);
+  const timeStartDate = getFormatedDate(startDate, `HH:mm`);
+  const fullEndDate = getFormatedDate(endDate, `YYYY-M-DD`);
+  const timeEndDate = getFormatedDate(endDate, `HH:mm`);
+
+  return `<li class="trip-events__item">
+          <div class="event">
+            <time class="event__date" datetime="${fullStartDate}">${getFormatedDate(startDate, `D MMM`)}</time>
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>
             <h3 class="event__title">${currentType} ${currentCity}</h3>
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="${dayjs(startDate).format(`YYYY-M-DD`) + `T` + dayjs(startDate).format(`HH:mm`)}">${dayjs(startDate).format(`HH:mm`)}</time>
+                <time class="event__start-time" datetime="${fullStartDate + `T` + timeStartDate}">${timeStartDate}</time>
                 &mdash;
-                <time class="event__end-time" datetime="${dayjs(endDate).format(`YYYY-M-DD`) + `T` + dayjs(endDate).format(`HH:mm`)}">${dayjs(endDate).format(`HH:mm`)}</time>
+                <time class="event__end-time" datetime="${fullEndDate + `T` + timeEndDate}">${timeEndDate}</time>
               </p>
               <p class="event__duration">${duration}</p>
             </div>
@@ -66,5 +59,30 @@ export const createTripPointTemplate = (serverData) => {
             <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
             </button>
-          </div>`;
+          </div>
+          </li>`;
 };
+
+class Point {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default Point;
