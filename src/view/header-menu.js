@@ -14,11 +14,10 @@ const createMenuTemplate = (serverData) => {
           </nav>`;
 };
 
-export default class Menu {
+class Menu {
   constructor(data) {
     this._element = null;
     this._data = data;
-    this._header = `<h2 class="visually-hidden">Switch trip view</h2>`;
   }
 
   getTemplate() {
@@ -32,11 +31,9 @@ export default class Menu {
     return this._element;
   }
 
-  getHeader() {
-    return createElement(this._header);
-  }
-
   removeElement() {
     this._element = null;
   }
 }
+
+export default Menu;
