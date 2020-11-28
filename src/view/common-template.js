@@ -1,9 +1,12 @@
 // Генерация разметки для списка с типом путешествия
 export const generateTypesListTemplate = (typesList) => {
   return typesList.reduce((result, type) => {
+
+    const typeLowerCase = type.toLowerCase();
+
     result += `<div class="event__type-item">
-                  <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}">
-                  <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
+                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeLowerCase}">
+                  <label class="event__type-label  event__type-label--${typeLowerCase}" for="event-type-${typeLowerCase}-1">${type}</label>
                 </div>`;
     return result;
   }, ``);
@@ -23,20 +26,17 @@ export const generateOffersListTemplate = (offersList) => {
     return ``;
   }
 
-  let offersListTemplate = offersList.reduce((result, offer) => {
-    let offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
-                                    id="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1" type="checkbox" 
-                                    name="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}">`;
+  const offersListTemplate = offersList.reduce((result, offer) => {
+    const isChecked = offer.checked ? `checked` : ``;
+    const offerName = offer.name.toLowerCase().replace(` `, `-`);
 
-    if (offer.checked) {
-      offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
-                                  id="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1" type="checkbox" 
-                                  name="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}" checked>`;
-    }
+    const offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
+                                    id="event-offer-${offerName}-1" type="checkbox" 
+                                    name="event-offer-${offerName}" ${isChecked}>`;
 
     result += `<div class="event__offer-selector">
                 ${offersListInputTemplate}
-                <label class="event__offer-label" for="event-offer-${offer.name.toLowerCase().replace(` `, `-`)}-1">
+                <label class="event__offer-label" for="event-offer-${offerName}-1">
                   <span class="event__offer-title">${offer.name}</span>
                   &plus;&euro;&nbsp;
                   <span class="event__offer-price">${offer.cost}</span>
@@ -59,12 +59,12 @@ export const getPointCost = (offersList) => {
     return 0;
   }
 
-  let pointCost = 0;
-  offersList.forEach((offer) => {
+  const pointCost = offersList.reduce((result, offer) => {
     if (offer.checked) {
-      pointCost += offer.cost;
+      result += offer.cost;
     }
-  });
+    return result;
+  }, 0);
 
   return pointCost;
 };
