@@ -71,6 +71,7 @@ const renderHeaderControls = () => {
 // --- Отрисовка в main ---
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 const tripEventsElement = siteMainElement.querySelector(`.trip-events`);
+render(tripEventsElement, new HiddenHeader(sortHeader).getElement(), RenderPosition.AFTERBEGIN);
 
 // Логика для отрисовки точек маршрута и формы редактирования
 const renderPoint = (container, point) => {
@@ -117,8 +118,8 @@ const renderPoint = (container, point) => {
 
 const renderContent = () => {
   // Отрисовка сортировки
-  render(tripEventsElement, new SortView(SORT_LIST).getElement(), RenderPosition.AFTERBEGIN);
-  render(tripEventsElement, new HiddenHeader(sortHeader).getElement(), RenderPosition.AFTERBEGIN);
+  render(tripEventsElement, new SortView(SORT_LIST).getElement(), RenderPosition.BEFOREEND);
+
 
   // Добавление контейнера (ul) для точек и форм
   const eventsList = new EventsListContainer();
@@ -138,8 +139,6 @@ renderHeaderControls();
 
 if (pointsList.length === 0) {
   render(tripEventsElement, new Placeholder().getElement(), RenderPosition.BEFOREEND);
-  render(tripEventsElement, new HiddenHeader(sortHeader).getElement(), RenderPosition.AFTERBEGIN);
-
 } else {
   renderHeaderInfo();
   renderContent();
