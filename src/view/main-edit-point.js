@@ -1,3 +1,4 @@
+import {DateFormats} from "../const";
 import {createElement, getFormatedDate} from "../utils";
 import {getPointCost, generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
@@ -23,6 +24,7 @@ const generateDestinationTemplate = (photos, descr) => {
           </section>`;
 };
 
+const {FULL_TIME: formateFullTime} = DateFormats;
 const createEditPointTemplate = (serverData) => {
   const {typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate} = serverData;
   return `<li class="trip-events__item">
@@ -55,10 +57,10 @@ const createEditPointTemplate = (serverData) => {
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, `DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}">
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, `DD/MM/YY HH:mm`)}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
