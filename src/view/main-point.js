@@ -1,3 +1,4 @@
+import {DateFormats} from "../const";
 import {createElement, getFormatedDate} from "../utils";
 import {getPointCost} from "./common-template";
 
@@ -20,17 +21,17 @@ const createOffersListTemplate = (offersList) => {
   }, ``);
 };
 
-
+const {FULL: formateFull, TIME: formateTime, DAY_MOUNTH: formateDayMounth} = DateFormats;
 export const createPointTemplate = (serverData) => {
   const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
-  const fullStartDate = getFormatedDate(startDate, `YYYY-M-DD`);
-  const timeStartDate = getFormatedDate(startDate, `HH:mm`);
-  const fullEndDate = getFormatedDate(endDate, `YYYY-M-DD`);
-  const timeEndDate = getFormatedDate(endDate, `HH:mm`);
+  const fullStartDate = getFormatedDate(startDate, formateFull);
+  const timeStartDate = getFormatedDate(startDate, formateTime);
+  const fullEndDate = getFormatedDate(endDate, formateFull);
+  const timeEndDate = getFormatedDate(endDate, formateTime);
 
   return `<li class="trip-events__item">
           <div class="event">
-            <time class="event__date" datetime="${fullStartDate}">${getFormatedDate(startDate, `D MMM`)}</time>
+            <time class="event__date" datetime="${fullStartDate}">${getFormatedDate(startDate, formateDayMounth)}</time>
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>

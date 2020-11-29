@@ -1,5 +1,5 @@
 import {createElement, getFormatedDate} from '../utils';
-import {maxCityVisible} from '../const';
+import {DateFormats, maxCityVisible} from '../const';
 
 // Получаем маршрут путешествия
 const getTitleInfo = (pointsList) => {
@@ -18,12 +18,13 @@ const getTitleInfo = (pointsList) => {
 };
 
 // Получаем дату начала и окончания путешествия
+const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
 const getDateInfo = (pointsList) => {
   const startDate = pointsList[0].startDate;
   const endDate = pointsList[pointsList.length - 1].endDate;
-  const choiceFormatDate = getFormatedDate(startDate, `M`) !== getFormatedDate(endDate, `M`) ? getFormatedDate(endDate, `MMM D`) : getFormatedDate(endDate, `D`);
+  const choiceFormatDate = getFormatedDate(startDate, formateMounth) !== getFormatedDate(endDate, formateMounth) ? getFormatedDate(endDate, fomrmateMounthDay) : getFormatedDate(endDate, formateDay);
 
-  return `${getFormatedDate(startDate, `MMM D`)}&nbsp;&mdash;&nbsp;${choiceFormatDate}`;
+  return `${getFormatedDate(startDate, fomrmateMounthDay)}&nbsp;&mdash;&nbsp;${choiceFormatDate}`;
 };
 
 const createInfoTemplate = (serverData) => {
