@@ -2,16 +2,14 @@ import AbstractView from "./abstract.js";
 
 // Получаем итоговую цену путешествия
 const getTripCost = (pointsList) => {
-  let tripCost = 0;
-  pointsList.forEach((point) => {
+  return pointsList.reduce((result, point) => {
     point.currentOffers.forEach((offer) => {
       if (offer.checked) {
-        tripCost += offer.cost;
+        result += offer.cost;
       }
     });
-  });
-
-  return tripCost;
+    return result;
+  }, 0);
 };
 
 const createTripCostTemplate = (serverData) => {
