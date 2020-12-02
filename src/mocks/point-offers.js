@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomItem} from '../utils';
+import {getRandomInteger, getRandomItem} from '../utils/common';
 import {OptionsCount, PossibleCost, POSSIBLE_NAME, TRIP_POINTS_TYPES} from './const';
 
 const generateListPointOffer = () => {

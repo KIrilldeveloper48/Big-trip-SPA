@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {getRandomInteger} from '../utils';
+import {getRandomInteger} from '../utils/common';
 
 import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount} from './const';
 
