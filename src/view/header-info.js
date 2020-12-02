@@ -1,5 +1,6 @@
-import {createElement, getFormatedDate} from '../utils';
+import {getFormatedDate} from '../utils/common';
 import {DateFormats, maxCityVisible} from '../const';
+import AbstractView from './abstract';
 
 // Получаем маршрут путешествия
 const getTitleInfo = (pointsList) => {
@@ -8,18 +9,14 @@ const getTitleInfo = (pointsList) => {
     return `${pointsList[0].currentCity} &mdash; ... &mdash; ${pointsList[pointsList.length - 1].currentCity}`;
   }
 
-  return pointsList.reduce((result, point) => {
-    const isDash = point !== pointsList[pointsList.length - 1] ? `&mdash; ` : ``;
+  const cities = pointsList.map(({currentCity}) => currentCity);
 
-    result += `${point.currentCity} ${isDash}`;
-
-    return result;
-  }, ``);
+  return cities.join(` &mdash; `);
 };
 
 // Получаем дату начала и окончания путешествия
-const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
 const getDateInfo = (pointsList) => {
+  const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
   const startDate = pointsList[0].startDate;
   const endDate = pointsList[pointsList.length - 1].endDate;
   const choiceFormatDate = getFormatedDate(startDate, formateMounth) !== getFormatedDate(endDate, formateMounth) ? getFormatedDate(endDate, fomrmateMounthDay) : getFormatedDate(endDate, formateDay);
@@ -38,25 +35,9 @@ const createInfoTemplate = (serverData) => {
 };
 
 
-class TripInfo {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class TripInfo extends AbstractView {
   getTemplate() {
     return createInfoTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

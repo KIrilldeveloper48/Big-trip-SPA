@@ -1,5 +1,6 @@
 import {DateFormats} from "../const";
-import {createElement, getFormatedDate} from "../utils";
+import {getFormatedDate} from "../utils/common";
+import AbstractView from "./abstract";
 import {getPointCost, generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
 // Генерация разметки для описания точки
@@ -86,25 +87,34 @@ const createEditPointTemplate = (serverData) => {
         </li>`;
 };
 
-class EditPoint {
+class EditPoint extends AbstractView {
   constructor(data) {
-    this._element = null;
-    this._data = data;
+    super(data);
+    this._submitHandler = this._submitHandler.bind(this);
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createEditPointTemplate(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
   }
 
-  removeElement() {
-    this._element = null;
+  _clickHandler() {
+    this._callback.click();
+  }
+
+  setSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector(`.event--edit`).addEventListener(`submit`, this._submitHandler);
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
   }
 }
 

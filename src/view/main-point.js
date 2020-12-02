@@ -1,5 +1,6 @@
 import {DateFormats} from "../const";
-import {createElement, getFormatedDate} from "../utils";
+import {getFormatedDate} from "../utils/common";
+import AbstractView from "./abstract";
 import {getPointCost} from "./common-template";
 
 
@@ -64,25 +65,23 @@ export const createPointTemplate = (serverData) => {
           </li>`;
 };
 
-class Point {
+class Point extends AbstractView {
   constructor(data) {
-    this._element = null;
-    this._data = data;
+    super(data);
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createPointTemplate(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _clickHandler() {
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
   }
 }
 
