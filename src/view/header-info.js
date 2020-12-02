@@ -9,18 +9,12 @@ const getTitleInfo = (pointsList) => {
     return `${pointsList[0].currentCity} &mdash; ... &mdash; ${pointsList[pointsList.length - 1].currentCity}`;
   }
 
-  return pointsList.reduce((result, point) => {
-    const isDash = point !== pointsList[pointsList.length - 1] ? `&mdash; ` : ``;
-
-    result += `${point.currentCity} ${isDash}`;
-
-    return result;
-  }, ``);
+  return [pointsList[0].currentCity, pointsList[1].currentCity].join(` &mdash; `);
 };
 
 // Получаем дату начала и окончания путешествия
-const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
 const getDateInfo = (pointsList) => {
+  const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
   const startDate = pointsList[0].startDate;
   const endDate = pointsList[pointsList.length - 1].endDate;
   const choiceFormatDate = getFormatedDate(startDate, formateMounth) !== getFormatedDate(endDate, formateMounth) ? getFormatedDate(endDate, fomrmateMounthDay) : getFormatedDate(endDate, formateDay);
