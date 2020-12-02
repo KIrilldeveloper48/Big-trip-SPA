@@ -9,7 +9,9 @@ const getTitleInfo = (pointsList) => {
     return `${pointsList[0].currentCity} &mdash; ... &mdash; ${pointsList[pointsList.length - 1].currentCity}`;
   }
 
-  return [pointsList[0].currentCity, pointsList[1].currentCity].join(` &mdash; `);
+  const cities = pointsList.map(({currentCity}) => currentCity);
+
+  return cities.join(` &mdash; `);
 };
 
 // Получаем дату начала и окончания путешествия
