@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
 
 const createPlaceholderTemplate = () => {
@@ -7,25 +7,9 @@ const createPlaceholderTemplate = () => {
 };
 
 
-class Placeholder {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class Placeholder extends AbstractView {
   getTemplate() {
     return createPlaceholderTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

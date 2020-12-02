@@ -1,5 +1,6 @@
-import {createElement, getFormatedDate} from '../utils';
+import {getFormatedDate} from '../utils/common';
 import {DateFormats, maxCityVisible} from '../const';
+import AbstractView from './abstract';
 
 // Получаем маршрут путешествия
 const getTitleInfo = (pointsList) => {
@@ -38,25 +39,9 @@ const createInfoTemplate = (serverData) => {
 };
 
 
-class TripInfo {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class TripInfo extends AbstractView {
   getTemplate() {
     return createInfoTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

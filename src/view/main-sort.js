@@ -1,6 +1,5 @@
-import {createElement} from "../utils";
-
 import {SortListDisable} from '../mocks/const';
+import AbstractView from "./abstract";
 
 // Генерация разметки для типов сортировки точек
 const generateSortListTemplate = (sortList) => {
@@ -25,25 +24,9 @@ const createSortTemplate = (serverData) => {
           </form>`;
 };
 
-class Sort {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class Sort extends AbstractView {
   getTemplate() {
     return createSortTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

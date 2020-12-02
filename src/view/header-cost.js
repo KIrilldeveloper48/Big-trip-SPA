@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./abstract.js";
 
 // Получаем итоговую цену путешествия
 const getTripCost = (pointsList) => {
@@ -20,25 +20,9 @@ const createTripCostTemplate = (serverData) => {
           </p>`;
 };
 
-class TripCost {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class TripCost extends AbstractView {
   getTemplate() {
     return createTripCostTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

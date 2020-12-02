@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./abstract";
 
 // Генерация разметки для фильтрации точек
 const generateFiltersListTemplate = (filtersList) => {
@@ -24,25 +24,9 @@ const createFiltersTemplate = (serverData) => {
           </form>`;
 };
 
-class Filters {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class Filters extends AbstractView {
   getTemplate() {
     return createFiltersTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
