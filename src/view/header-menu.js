@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./abstract";
 
 // Генерация разметки для меню
 const generateMenuListTemplate = (menulist) => {
@@ -14,25 +14,9 @@ const createMenuTemplate = (serverData) => {
           </nav>`;
 };
 
-class Menu {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class Menu extends AbstractView {
   getTemplate() {
     return createMenuTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

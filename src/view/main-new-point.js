@@ -1,4 +1,4 @@
-import {createElement} from "../utils";
+import AbstractView from "./abstract";
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
 export const createNewPointTemplate = (serverData) => {
@@ -74,25 +74,9 @@ export const createNewPointTemplate = (serverData) => {
       </li>`;
 };
 
-class NewPoint {
-  constructor(data) {
-    this._element = null;
-    this._data = data;
-  }
-
+class NewPoint extends AbstractView {
   getTemplate() {
     return createNewPointTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
