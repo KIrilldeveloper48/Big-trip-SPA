@@ -90,6 +90,7 @@ const createEditPointTemplate = (serverData) => {
 class EditPoint extends AbstractView {
   constructor(data) {
     super(data);
+    this._data = data;
     this._submitHandler = this._submitHandler.bind(this);
     this._clickHandler = this._clickHandler.bind(this);
   }
@@ -100,7 +101,7 @@ class EditPoint extends AbstractView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit();
+    this._callback.submit(this._data);
   }
 
   _clickHandler() {
@@ -112,7 +113,7 @@ class EditPoint extends AbstractView {
     this.getElement().querySelector(`.event--edit`).addEventListener(`submit`, this._submitHandler);
   }
 
-  setClickHandler(callback) {
+  setEditClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
   }
