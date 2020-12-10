@@ -23,7 +23,7 @@ class Point {
     this._pointEditComponent = null;
     // Режим отображения по умолчанию
     this._mode = Mode.DEFAULT;
-    // Датабиндинг
+    // Привязывание контекста
     this._clickHandler = this._clickHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
 
@@ -119,7 +119,7 @@ class Point {
     this._replaceFormToPoint();
   }
 
-  // Для добавления точки в избранное. В коллбек передаются данные о точке с добавленным свойством isFavorite со значением true
+  // Для добавления точки в избранное. В коллбек передаются данные о точке с добавленным свойством isFavorite
   _handleFavoriteClick() {
     this._changeData(
         Object.assign(
