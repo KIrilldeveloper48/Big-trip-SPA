@@ -1,9 +1,15 @@
-// Сортировка точек маршрута по дате
-const getSortList = (a, b) => {
+import {getPointCost} from "../view/common-template";
+
+export const sortDate = (a, b) => {
   return a.startDate.getTime() - b.startDate.getTime();
 };
 
-export const getPointListSortDate = (list) => {
-  const listCopy = list.slice();
-  return listCopy.sort(getSortList);
+export const sortTime = (a, b) => {
+  const durationPointOne = a.endDate.getTime() - a.startDate.getTime();
+  const durationPointTwo = b.endDate.getTime() - b.startDate.getTime();
+  return durationPointTwo - durationPointOne;
+};
+
+export const sortPrice = (a, b) => {
+  return getPointCost(b.currentOffers) - getPointCost(a.currentOffers);
 };
