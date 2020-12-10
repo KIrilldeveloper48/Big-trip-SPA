@@ -41,15 +41,15 @@ class Trip {
     this._menuHeaderComponent = new HiddenHeader(menuHeader);
     this._filtersHeaderComponent = new HiddenHeader(filterHeader);
     this._eventsListHeaderComponent = new HiddenHeader(sortHeader);
-    // Датабиндинг
+    // Привязывание контекста
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   // Инициализация
-  init(pointsList) {
+  init(pointList, sorting) {
     // Копируем массив с данными точек, чтобы сохранить исходный порядок элементов
-    this._pointsList = pointsList.slice();
+    this._pointList = pointList.slice();
     // Отрисовываем менюшку
     this._renderHeaderControls();
     // Отрисовываем скрытый заголовок для контентной части
@@ -57,12 +57,12 @@ class Trip {
 
     // Запусаем проверку: если нет точек которые можно отрисовать - рисуем заглушку,
     // Иначе отрисовываем информацию о маршруте и стоимости, сортировку и сами точки
-    if (this._pointsList.length === 0) {
+    if (this._pointList.length === 0) {
       this._renderNoPoint();
     } else {
-      this._renderHeaderInfo(this._pointsList);
+      this._renderHeaderInfo(this._pointList);
       this._renderSort();
-      this._renderPoints(this._pointsList);
+      this._renderDisplayPoint(sorting);
     }
   }
 
@@ -105,7 +105,7 @@ class Trip {
 
   // Этот метод обновляет элемент массива и запускает отрисовку обновлённого элемента
   _handlePointChange(updatedPoint) {
-    this._pointsList = updateItem(this._pointsList, updatedPoint);
+    this._pointList = updateItem(this._pointList, updatedPoint);
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
   }
   // Этот метод проходится по всем презентарам в списке и у каждого вызывает метод сброса режима отображения
@@ -117,6 +117,11 @@ class Trip {
   _clearPointsList() {
     Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
+  }
+
+  _renderDisplayPoint(sorting) {
+    const sortedPoint = sorting(this._pointList);
+    this._renderPoints(sortedPoint);
   }
 
   // Отрисовка всех точек
