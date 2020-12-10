@@ -1,6 +1,5 @@
 import {generateTripPoints} from './mocks/trip-point';
 import Trip from "./presenter/Trip";
-import {getPointListSortDate} from './utils/sorting';
 
 const POINTS_COUNT = 20;
 
@@ -20,4 +19,4 @@ const siteMainElement = document.querySelector(`.page-body`);
 
 const tripPresenter = new Trip(siteMainElement);
 
-tripPresenter.init(pointsList, getPointListSortDate);
+tripPresenter.init(pointsList);
