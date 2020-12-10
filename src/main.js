@@ -1,5 +1,6 @@
 import {generateTripPoints} from './mocks/trip-point';
 import Trip from "./presenter/Trip";
+import {getPointListSortDate} from './utils/sorting';
 
 const POINTS_COUNT = 20;
 
@@ -13,21 +14,10 @@ const getPointList = () => {
   return pointList;
 };
 
-// Сортировка точек маршрута по дате
-const getSortList = (a, b) => {
-  return a.startDate.getTime() - b.startDate.getTime();
-};
-
-const getPointListSort = () => {
-  const pointListCopy = pointsList.slice();
-  return pointListCopy.sort(getSortList);
-};
-
 const pointsList = getPointList();
-const pointListSort = getPointListSort();
 
 const siteMainElement = document.querySelector(`.page-body`);
 
 const tripPresenter = new Trip(siteMainElement);
 
-tripPresenter.init(pointListSort);
+tripPresenter.init(pointsList, getPointListSortDate);
