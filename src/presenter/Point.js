@@ -66,7 +66,7 @@ class Point {
     remove(prevPointEditComponent);
   }
 
-  // Метод для возращения всех точек в рнежим отображения по умолчанию
+  // Метод для возращения всех точек в режим отображения по умолчанию
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToPoint();
