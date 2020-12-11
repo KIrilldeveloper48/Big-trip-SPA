@@ -14,6 +14,11 @@ export const SortListDisable = {
   EVENT: `Event`,
   OFFERS: `Offers`
 };
+export const SortType = {
+  DEFAULT: `day`,
+  TIME: `time`,
+  PRICE: `price`
+};
 export const PossibleCost = {
   MIN: 5,
   MAX: 100

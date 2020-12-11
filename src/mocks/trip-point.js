@@ -3,6 +3,8 @@ import {getRandomInteger} from '../utils/common';
 
 import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount} from './const';
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 // Генерация описания для точки
 const generatePointDescr = () => {
   const {MIN: min, MAX: max} = SentenceCount;
@@ -93,6 +95,7 @@ export const generateTripPoints = () => {
   const endDate = generateEndDate(startDate);
   const currentOffers = getCurrentOffers(currentType);
   return {
+    id: generateId(),
     typesList: TRIP_POINTS_TYPES,
     currentType,
     citiesList: CITIES_LIST,
