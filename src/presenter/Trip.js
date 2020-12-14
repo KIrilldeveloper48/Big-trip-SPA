@@ -52,16 +52,14 @@ class Trip {
 
   // Инициализация
   init(pointList) {
-    // Сортируем исходный массив, так как исходный порядок элементов нам нигде не требуется, везде используется уже отсортированный по датам
-    this._pointList = pointList.sort(sortDate);
-    // Отсортированный массив сохраняем, чтобы можно было восстановить сортировку по датам после других типов сортировки
-    this._sourcedPointList = this._pointList.slice();
+    // Сохраняем исходный массив
+    this._pointList = pointList.slice();
     // Отрисовываем менюшку
     this._renderHeaderControls();
     // Отрисовываем скрытый заголовок для контентной части
     this._renderH2ForTripEvents();
 
-    // Запусаем проверку: если нет точек которые можно отрисовать - рисуем заглушку,
+    // Запускаем проверку: если нет точек которые можно отрисовать - рисуем заглушку,
     // Иначе отрисовываем информацию о маршруте и стоимости, сортировку и сами точки
     if (this._pointList.length === 0) {
       this._renderNoPoint();
@@ -74,11 +72,12 @@ class Trip {
 
   // Отрисовка информация для цены и маршруте путешествия
   _renderHeaderInfo() {
+    const pointList = this._sortingPoints(this._currentSortType);
     const mainHeaderElement = this._tripContainer.querySelector(`.trip-main`);
-    render(mainHeaderElement, new InfoView(this._pointList), RenderPosition.AFTERBEGIN);
+    render(mainHeaderElement, new InfoView(pointList), RenderPosition.AFTERBEGIN);
 
     const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-    render(tripInfoElement, new CostView(this._pointList), RenderPosition.BEFOREEND);
+    render(tripInfoElement, new CostView(pointList), RenderPosition.BEFOREEND);
   }
 
   // Отрисовка меню и фильтров
@@ -120,19 +119,25 @@ class Trip {
     Object.values(this._pointPresenter).forEach((presentor) => presentor.resetView());
   }
 
-  // Метод для сортировки массива с точками, в зависимости от выбранного типа сортировки
-  _sortPoints(sortType) {
+  // Метод для назначения типа сортировки точек
+  _setSortingType(sortType) {
+    this._currentSortType = sortType;
+  }
+
+  // Метод для получения отсортированного массива с точками, в зависимости от выбранного типа сортировки
+  _sortingPoints(sortType) {
+    let sortedPoints = this._pointList.slice();
     switch (sortType) {
       case SortType.TIME:
-        this._pointList.sort(sortTime);
+        sortedPoints.sort(sortTime);
         break;
       case SortType.PRICE:
-        this._pointList.sort(sortPrice);
+        sortedPoints.sort(sortPrice);
         break;
       default:
-        this._pointList = this._sourcedPointList.slice();
+        sortedPoints.sort(sortDate);
     }
-    this._currentSortType = sortType;
+    return sortedPoints;
   }
 
   // Коллбэк с логикой для отрисовки отсортированных точек
@@ -140,7 +145,7 @@ class Trip {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortPoints(sortType);
+    this._setSortingType(sortType);
     this._clearPointsList();
     this._renderPoints();
   }
@@ -153,11 +158,12 @@ class Trip {
 
   // Отрисовка всех точек
   _renderPoints() {
+    const pointList = this._sortingPoints(this._currentSortType);
     // Отрисовка конетнера, куда будут рендериться точки
     render(this._pointsContainer, this._eventsListComponent, RenderPosition.BEFOREEND);
 
     for (let i = 0; i < this._pointList.length; i++) {
-      this._renderPoint(this._pointList[i]);
+      this._renderPoint(pointList[i]);
     }
   }
 
