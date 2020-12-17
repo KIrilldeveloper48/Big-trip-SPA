@@ -14,7 +14,7 @@ import Placeholder from "../view/placeholder";
 import {SORT_LIST, FILTERS_LIST, MENU_LIST, SortType} from '../mocks/const';
 import {generateTripPoints} from '../mocks/trip-point';
 // Всп. функции
-import {render, RenderPosition} from '../utils/render';
+import {render, RenderPosition, remove, replace} from '../utils/render';
 import {updateItem} from "../utils/common";
 import {sortTime, sortPrice, sortDate} from "../utils/sorting";
 // Константы
@@ -34,6 +34,8 @@ class Trip {
     // Изначальный тип сортировки (По дате)
     this._currentSortType = SortType.DEFAULT;
     // Компоненты для отрисовки
+    this._headerInfoComponent = null;
+    this._headerCostComponent = null;
     this._menuComponent = new MenuView(MENU_LIST);
     this._filtersComponent = new FiltersView(FILTERS_LIST);
     this._sortComponent = new SortView(SORT_LIST);
@@ -72,12 +74,29 @@ class Trip {
 
   // Отрисовка информация для цены и маршруте путешествия
   _renderHeaderInfo() {
-    const pointList = this._sortingPoints(this._currentSortType);
-    const mainHeaderElement = this._tripContainer.querySelector(`.trip-main`);
-    render(mainHeaderElement, new InfoView(pointList), RenderPosition.AFTERBEGIN);
+    const pointList = this._getSortedPoints(this._currentSortType);
 
-    const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-    render(tripInfoElement, new CostView(pointList), RenderPosition.BEFOREEND);
+    const prevHeaderInfoComponent = this._headerInfoComponent;
+    const prevHeaderCostComponent = this._headerCostComponent;
+
+    this._headerInfoComponent = new InfoView(pointList);
+    this._headerCostComponent = new CostView(pointList);
+
+    if (prevHeaderInfoComponent === null || prevHeaderCostComponent === null) {
+      const mainHeaderElement = this._tripContainer.querySelector(`.trip-main`);
+      render(mainHeaderElement, this._headerInfoComponent, RenderPosition.AFTERBEGIN);
+
+      const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
+      render(tripInfoElement, this._headerCostComponent, RenderPosition.BEFOREEND);
+      return;
+    } else {
+      replace(this._headerInfoComponent, prevHeaderInfoComponent);
+      const tripInfoElement = this._tripContainer.querySelector(`.trip-info`);
+      render(tripInfoElement, this._headerCostComponent, RenderPosition.BEFOREEND);
+    }
+
+    remove(prevHeaderInfoComponent);
+    remove(prevHeaderCostComponent);
   }
 
   // Отрисовка меню и фильтров
@@ -113,6 +132,7 @@ class Trip {
   _handlePointChange(updatedPoint) {
     this._pointList = updateItem(this._pointList, updatedPoint);
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
+    this._renderHeaderInfo();
   }
   // Этот метод проходится по всем презентарам в списке и у каждого вызывает метод сброса режима отображения
   _handleModeChange() {
@@ -125,7 +145,7 @@ class Trip {
   }
 
   // Метод для получения отсортированного массива с точками, в зависимости от выбранного типа сортировки
-  _sortingPoints(sortType) {
+  _getSortedPoints(sortType) {
     let sortedPoints = this._pointList.slice();
     switch (sortType) {
       case SortType.TIME:
@@ -158,7 +178,7 @@ class Trip {
 
   // Отрисовка всех точек
   _renderPoints() {
-    const pointList = this._sortingPoints(this._currentSortType);
+    const pointList = this._getSortedPoints(this._currentSortType);
     // Отрисовка конетнера, куда будут рендериться точки
     render(this._pointsContainer, this._eventsListComponent, RenderPosition.BEFOREEND);
 

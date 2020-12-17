@@ -1,7 +1,9 @@
 import {DateFormats} from "../const";
 import {getFormatedDate} from "../utils/common";
-import AbstractView from "./abstract";
-import {getPointCost, generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
+import {generatePointDescr, generatePointPhotos} from './../mocks/trip-point';
+import {OFFERS_LIST} from "../mocks/const";
+import SmartView from "./smart";
 
 // Генерация разметки для описания точки
 const generateDestinationTemplate = (photos, descr) => {
@@ -27,7 +29,7 @@ const generateDestinationTemplate = (photos, descr) => {
 
 const {FULL_TIME: formateFullTime} = DateFormats;
 const createEditPointTemplate = (serverData) => {
-  const {typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate} = serverData;
+  const {typesList, currentType, citiesList, cost, currentCity, currentOffers, descr, photosList, startDate, endDate} = serverData;
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -69,7 +71,7 @@ const createEditPointTemplate = (serverData) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${getPointCost(currentOffers)}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -87,18 +89,48 @@ const createEditPointTemplate = (serverData) => {
         </li>`;
 };
 
-class EditPoint extends AbstractView {
+class EditPoint extends SmartView {
   constructor(data) {
     super(data);
-    this._data = data;
+    this._data = this._parseDataToUpdatedDate(data);
+    // Привязывание контекста
     this._submitHandler = this._submitHandler.bind(this);
     this._clickHandler = this._clickHandler.bind(this);
+    this._pointTypeHandler = this._pointTypeHandler.bind(this);
+    this._cityHandler = this._cityHandler.bind(this);
+    this._costInputHandler = this._costInputHandler.bind(this);
+    this._offerHandler = this._offerHandler.bind(this);
+    // Навешиваем обработчики на выбор типа, города и изменение стоимости
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createEditPointTemplate(this._data);
   }
 
+  // Восстановление обработчиков
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callback.submit);
+    this.setEditClickHandler(this._callback.click);
+  }
+
+  // Восстановление исходной версии при выходе из редактирования без сохранения
+  reset(data) {
+    this.updateData(
+        this._parseDataToUpdatedDate(data)
+    );
+  }
+
+  // Метод для получения списка доступных опций для конкртеного типа путешествия
+  _getOffers(currentType) {
+    if (OFFERS_LIST[currentType].length === 0) {
+      return [];
+    }
+    return OFFERS_LIST[currentType];
+  }
+
+  // Обработчики
   _submitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(this._data);
@@ -108,6 +140,56 @@ class EditPoint extends AbstractView {
     this._callback.click();
   }
 
+  _pointTypeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      currentType: evt.target.value,
+      currentOffers: this._getOffers(evt.target.value)
+    });
+  }
+
+  _cityHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      currentCity: evt.target.value,
+      descr: generatePointDescr(),
+      photosList: generatePointPhotos()
+    });
+  }
+
+  _costInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      cost: Number(evt.target.value)
+    }, true);
+  }
+
+  _offerHandler(evt) {
+    evt.preventDefault();
+    const inputValue = evt.target.dataset.value;
+    const currentOfferList = this._data.currentOffers;
+    const modifiedOfferList = [];
+    for (let i = 0; i <= currentOfferList.length - 1; i++) {
+      if (currentOfferList[i].name !== inputValue) {
+        modifiedOfferList.push(currentOfferList[i]);
+      } else {
+        const modifiedOffer = Object.assign(
+            {},
+            currentOfferList[i],
+            {
+              checked: !currentOfferList[i].checked
+            }
+        );
+        modifiedOfferList[i] = modifiedOffer;
+      }
+    }
+
+    this.updateData({
+      currentOffers: modifiedOfferList
+    }, true);
+  }
+
+  // Установка обработчиков
   setSubmitHandler(callback) {
     this._callback.submit = callback;
     this.getElement().querySelector(`.event--edit`).addEventListener(`submit`, this._submitHandler);
@@ -116,6 +198,37 @@ class EditPoint extends AbstractView {
   setEditClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+  }
+
+  _setOffersHandler() {
+    if (this._data.currentOffers.length === 0) {
+      return;
+    }
+    const offerList = this.getElement().querySelectorAll(`.event__offer-checkbox`);
+    offerList.forEach((offer) => {
+      offer.addEventListener(`change`, this._offerHandler);
+    });
+  }
+
+  _setPointTypeHandler() {
+    const typeList = this.getElement().querySelectorAll(`.event__type-input`);
+    typeList.forEach((item) => {
+      item.addEventListener(`change`, this._pointTypeHandler);
+    });
+  }
+
+  _setInnerHandlers() {
+    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, this._cityHandler);
+    this.getElement().querySelector(`#event-price-1`).addEventListener(`input`, this._costInputHandler);
+    this._setPointTypeHandler();
+    this._setOffersHandler();
+  }
+
+  _parseDataToUpdatedDate(data) {
+    return Object.assign(
+        {},
+        data
+    );
   }
 }
 

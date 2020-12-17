@@ -5,7 +5,7 @@ export const generateTypesListTemplate = (typesList) => {
     const typeLowerCase = type.toLowerCase();
 
     result += `<div class="event__type-item">
-                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeLowerCase}">
+                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
                   <label class="event__type-label  event__type-label--${typeLowerCase}" for="event-type-${typeLowerCase}-1">${type}</label>
                 </div>`;
     return result;
@@ -28,11 +28,10 @@ export const generateOffersListTemplate = (offersList) => {
 
   const offersListTemplate = offersList.reduce((result, offer) => {
     const isChecked = offer.checked ? `checked` : ``;
-    const offerName = offer.name.toLowerCase().replace(` `, `-`);
-
+    const offerName = offer.name.toLowerCase().replace(/ /g, `-`); // Первый параметр передаваемы в replace обозначает замену ВСЕХ подходящих подстрок (в нашем случае пробелов), а не только первое вхождение
     const offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
                                     id="event-offer-${offerName}-1" type="checkbox" 
-                                    name="event-offer-${offerName}" ${isChecked}>`;
+                                    name="event-offer-${offerName}" data-value="${offer.name}" ${isChecked}>`;
 
     result += `<div class="event__offer-selector">
                 ${offersListInputTemplate}
@@ -51,20 +50,4 @@ export const generateOffersListTemplate = (offersList) => {
               ${offersListTemplate}
             </div>
           </section>`;
-};
-
-// Получаем итоговую цену для точки исходя из выбранных предложений
-export const getPointCost = (offersList) => {
-  if (offersList.length === 0) {
-    return 0;
-  }
-
-  const pointCost = offersList.reduce((result, offer) => {
-    if (offer.checked) {
-      result += offer.cost;
-    }
-    return result;
-  }, 0);
-
-  return pointCost;
 };

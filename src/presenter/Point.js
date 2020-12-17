@@ -98,6 +98,7 @@ class Point {
   _escKeyDownHandler(evt) {
     if (evt.key === escapeKey || evt.key === escKey) {
       evt.preventDefault();
+      this._pointEditComponent.reset(this._point);
       this._replaceFormToPoint();
     }
   }
@@ -110,6 +111,7 @@ class Point {
 
   // Для закрытия формы без сохранения изменений
   _editClickHandler() {
+    this._pointEditComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 
