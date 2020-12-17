@@ -11,11 +11,12 @@ const Mode = {
 };
 
 class Point {
-  constructor(pointContainer, changeData, changeMode) {
+  constructor(pointContainer, changeData, changeMode, changeHeader) {
     // Контейнер для отрисовки точек
     this._pointContainerElement = pointContainer.getElement();
     // Метод для отображения изменённых данных
     this._changeData = changeData;
+    this._changeHeader = changeHeader;
     // Метод для смены режима отображения с editing на default
     this._changeMode = changeMode;
     // Эти свойства нужны для отслеживания состояния точки и формы редактирования - отрисованы они или нет
@@ -118,6 +119,7 @@ class Point {
   // Для закрытия формы с сохранением измененй
   _submitHandler(point) {
     this._changeData(point);
+    this._changeHeader();
     this._replaceFormToPoint();
   }
 

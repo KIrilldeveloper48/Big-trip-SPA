@@ -48,6 +48,7 @@ class Trip {
     this._eventsListHeaderComponent = new HiddenHeader(sortHeader);
     // Привязывание контекста
     this._handlePointChange = this._handlePointChange.bind(this);
+    this._handleHeaderInfoChange = this._handleHeaderInfoChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
@@ -74,7 +75,7 @@ class Trip {
 
   // Отрисовка информация для цены и маршруте путешествия
   _renderHeaderInfo() {
-    const pointList = this._getSortedPoints(this._currentSortType);
+    const pointList = this._getSortedPoints(SortType.DEFAULT);
 
     const prevHeaderInfoComponent = this._headerInfoComponent;
     const prevHeaderCostComponent = this._headerCostComponent;
@@ -123,7 +124,7 @@ class Trip {
   // Логика про отрисовке одной точки. Создаём новый экземпляр класса, в параметрнах передаём контейнер для отрисовки и функцию-коллбэк для обновления точки.
   // После каждого вызыва метода записываем новый экземпляр класса в список
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handlePointChange, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handlePointChange, this._handleModeChange, this._handleHeaderInfoChange);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
@@ -132,6 +133,10 @@ class Trip {
   _handlePointChange(updatedPoint) {
     this._pointList = updateItem(this._pointList, updatedPoint);
     this._pointPresenter[updatedPoint.id].init(updatedPoint);
+  }
+
+  // Этот метод запускает повторную отрисовку информации о путешествии
+  _handleHeaderInfoChange() {
     this._renderHeaderInfo();
   }
   // Этот метод проходится по всем презентарам в списке и у каждого вызывает метод сброса режима отображения
