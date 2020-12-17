@@ -19,7 +19,11 @@ export const SortType = {
   TIME: `time`,
   PRICE: `price`
 };
-export const PossibleCost = {
+export const PossiblePointCost = {
+  MIN: 0,
+  MAX: 200
+};
+export const PossibleOfferCost = {
   MIN: 5,
   MAX: 100
 };

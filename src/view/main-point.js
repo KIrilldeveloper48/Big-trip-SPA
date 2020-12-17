@@ -1,7 +1,6 @@
 import {DateFormats} from "../const";
 import {getFormatedDate} from "../utils/common";
 import AbstractView from "./abstract";
-import {getPointCost} from "./common-template";
 
 
 // Генерация разметки для выбранных предложений в точке
@@ -24,12 +23,12 @@ const createOffersListTemplate = (offersList) => {
 
 const {FULL: formateFull, TIME: formateTime, DAY_MOUNTH: formateDayMounth} = DateFormats;
 export const createPointTemplate = (serverData) => {
-  const {currentType, currentCity, currentOffers, startDate, endDate, duration} = serverData;
+  const {currentType, currentCity, cost, currentOffers, startDate, endDate, duration, isFavorite} = serverData;
   const fullStartDate = getFormatedDate(startDate, formateFull);
   const timeStartDate = getFormatedDate(startDate, formateTime);
   const fullEndDate = getFormatedDate(endDate, formateFull);
   const timeEndDate = getFormatedDate(endDate, formateTime);
-  const isFavorite = serverData.isFavorite ? `event__favorite-btn--active` : ``;
+  const favorite = isFavorite ? `event__favorite-btn--active` : ``;
 
   return `<li class="trip-events__item">
           <div class="event">
@@ -47,13 +46,13 @@ export const createPointTemplate = (serverData) => {
               <p class="event__duration">${duration}</p>
             </div>
             <p class="event__price">
-              &euro;&nbsp;<span class="event__price-value">${getPointCost(currentOffers)}</span>
+              &euro;&nbsp;<span class="event__price-value">${cost}</span>
             </p>
             <h4 class="visually-hidden">Offers:</h4>
             <ul class="event__selected-offers">
               ${createOffersListTemplate(currentOffers)}
             </ul>
-            <button class="event__favorite-btn ${isFavorite}" type="button">
+            <button class="event__favorite-btn ${favorite}" type="button">
               <span class="visually-hidden">Add to favorite</span>
               <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                 <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
