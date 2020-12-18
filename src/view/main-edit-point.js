@@ -28,8 +28,7 @@ const generateDestinationTemplate = (photos, descr) => {
 };
 
 const {FULL_TIME: formateFullTime} = DateFormats;
-const createEditPointTemplate = (serverData) => {
-  const {typesList, currentType, citiesList, cost, currentCity, currentOffers, descr, photosList, startDate, endDate} = serverData;
+const createEditPointTemplate = ({typesList, currentType, citiesList, cost, currentCity, currentOffers, descr, photosList, startDate, endDate}) => {
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -92,17 +91,20 @@ const createEditPointTemplate = (serverData) => {
 class EditPoint extends SmartView {
   constructor(data) {
     super(data);
-    this._data = this._parseDataToUpdatedDate(data);
+    this._data = EditPoint.parseDataToUpdatedDate(data);
     // Привязывание контекста
-    this._submitHandler = this._submitHandler.bind(this);
-    this._clickHandler = this._clickHandler.bind(this);
-    this._pointTypeHandler = this._pointTypeHandler.bind(this);
-    this._cityHandler = this._cityHandler.bind(this);
+    this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
+    this._pointTypeChangeHandler = this._pointTypeChangeHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
     this._costInputHandler = this._costInputHandler.bind(this);
-    this._offerHandler = this._offerHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
     // Навешиваем обработчики на выбор типа, города и изменение стоимости
     this._setInnerHandlers();
   }
+
+
+  // -------- Основные методы -------- //
 
   getTemplate() {
     return createEditPointTemplate(this._data);
@@ -112,13 +114,13 @@ class EditPoint extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.submit);
-    this.setEditClickHandler(this._callback.click);
+    this.setCloseClickHandler(this._callback.click);
   }
 
   // Восстановление исходной версии при выходе из редактирования без сохранения
   reset(data) {
     this.updateData(
-        this._parseDataToUpdatedDate(data)
+        EditPoint.parseDataToUpdatedDate(data)
     );
   }
 
@@ -130,17 +132,19 @@ class EditPoint extends SmartView {
     return OFFERS_LIST[currentType];
   }
 
-  // Обработчики
-  _submitHandler(evt) {
+
+  // -------- Обработчики -------- //
+
+  _btnSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(this._data);
   }
 
-  _clickHandler() {
+  _closeClickHandler() {
     this._callback.click();
   }
 
-  _pointTypeHandler(evt) {
+  _pointTypeChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
       currentType: evt.target.value,
@@ -148,7 +152,7 @@ class EditPoint extends SmartView {
     });
   }
 
-  _cityHandler(evt) {
+  _cityChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
       currentCity: evt.target.value,
@@ -164,67 +168,66 @@ class EditPoint extends SmartView {
     }, true);
   }
 
-  _offerHandler(evt) {
+  _offerChangeHandler(evt) {
     evt.preventDefault();
     const inputValue = evt.target.dataset.value;
     const currentOfferList = this._data.currentOffers;
-    const modifiedOfferList = [];
-    for (let i = 0; i <= currentOfferList.length - 1; i++) {
-      if (currentOfferList[i].name !== inputValue) {
-        modifiedOfferList.push(currentOfferList[i]);
-      } else {
-        const modifiedOffer = Object.assign(
+    const modifiedOfferList = currentOfferList.map((currentOffer) => {
+      return currentOffer.name === inputValue ?
+        Object.assign(
             {},
-            currentOfferList[i],
+            currentOffer,
             {
-              checked: !currentOfferList[i].checked
+              checked: !currentOffer.checked
             }
-        );
-        modifiedOfferList[i] = modifiedOffer;
-      }
-    }
+        ) : currentOffer;
+    });
 
     this.updateData({
       currentOffers: modifiedOfferList
     }, true);
   }
 
-  // Установка обработчиков
+  // -------- Установка обработчиков -------- //
+
   setSubmitHandler(callback) {
     this._callback.submit = callback;
-    this.getElement().querySelector(`.event--edit`).addEventListener(`submit`, this._submitHandler);
+    this.getElement().querySelector(`.event--edit`).addEventListener(`submit`, this._btnSubmitHandler);
   }
 
-  setEditClickHandler(callback) {
+  setCloseClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
-  _setOffersHandler() {
+  _setOffersChangeHandler() {
     if (this._data.currentOffers.length === 0) {
       return;
     }
     const offerList = this.getElement().querySelectorAll(`.event__offer-checkbox`);
     offerList.forEach((offer) => {
-      offer.addEventListener(`change`, this._offerHandler);
+      offer.addEventListener(`change`, this._offerChangeHandler);
     });
   }
 
-  _setPointTypeHandler() {
+  _setPointTypeChangeHandler() {
     const typeList = this.getElement().querySelectorAll(`.event__type-input`);
     typeList.forEach((item) => {
-      item.addEventListener(`change`, this._pointTypeHandler);
+      item.addEventListener(`change`, this._pointTypeChangeHandler);
     });
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, this._cityHandler);
-    this.getElement().querySelector(`#event-price-1`).addEventListener(`input`, this._costInputHandler);
-    this._setPointTypeHandler();
-    this._setOffersHandler();
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityChangeHandler);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._costInputHandler);
+    this._setPointTypeChangeHandler();
+    this._setOffersChangeHandler();
   }
 
-  _parseDataToUpdatedDate(data) {
+
+  // -------- Статичные методы -------- //
+
+  static parseDataToUpdatedDate(data) {
     return Object.assign(
         {},
         data
