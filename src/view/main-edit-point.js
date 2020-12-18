@@ -1,9 +1,14 @@
-import {DateFormats} from "../const";
-import {getFormatedDate} from "../utils/common";
-import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
-import {generatePointDescr, generatePointPhotos} from './../mocks/trip-point';
-import {OFFERS_LIST} from "../mocks/const";
 import SmartView from "./smart";
+
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
+import {generatePointDescr, generatePointPhotos, getTripPointDuration} from './../mocks/trip-point';
+
+import {getFormatedDate} from "../utils/common";
+import {DateFormats} from "../const";
+import {OFFERS_LIST} from "../mocks/const";
+import flatpickr from "flatpickr";
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 // Генерация разметки для описания точки
 const generateDestinationTemplate = (photos, descr) => {
@@ -92,6 +97,9 @@ class EditPoint extends SmartView {
   constructor(data) {
     super(data);
     this._data = EditPoint.parseDataToUpdatedDate(data);
+    this.startDatepicker = null;
+    this.endDatepicker = null;
+
     // Привязывание контекста
     this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
@@ -99,8 +107,12 @@ class EditPoint extends SmartView {
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
     this._costInputHandler = this._costInputHandler.bind(this);
     this._offerChangeHandler = this._offerChangeHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+
     // Навешиваем обработчики на выбор типа, города и изменение стоимости
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
 
@@ -113,6 +125,7 @@ class EditPoint extends SmartView {
   // Восстановление обработчиков
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
     this.setSubmitHandler(this._callback.submit);
     this.setCloseClickHandler(this._callback.click);
   }
@@ -188,6 +201,22 @@ class EditPoint extends SmartView {
     }, true);
   }
 
+  _startDateChangeHandler([userDate]) {
+
+    this.updateData({
+      startDate: userDate,
+      duration: getTripPointDuration(userDate, this._data.endDate)
+    }, true);
+  }
+
+  _endDateChangeHandler([userDate]) {
+
+    this.updateData({
+      endDate: userDate,
+      duration: getTripPointDuration(this._data.startDate, userDate)
+    }, true);
+  }
+
   // -------- Установка обработчиков -------- //
 
   setSubmitHandler(callback) {
@@ -222,6 +251,37 @@ class EditPoint extends SmartView {
     this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._costInputHandler);
     this._setPointTypeChangeHandler();
     this._setOffersChangeHandler();
+  }
+
+  _setDatepicker() {
+    if (this._startDatepicker || this._endtDatepicker) {
+      this._startDatepicker.destroy();
+      this._endDatepicker.destroy();
+      this._startDatepicker = null;
+      this._endDatepicker = null;
+    }
+
+    this._startDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          enableTime: true,
+          time_24hr: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._data.startDate,
+          onChange: this._startDateChangeHandler
+        }
+    );
+
+    this._endDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          enableTime: true,
+          time_24hr: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._data.endDate,
+          onChange: this._endDateChangeHandler
+        }
+    );
   }
 
 
