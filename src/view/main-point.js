@@ -22,8 +22,7 @@ const createOffersListTemplate = (offersList) => {
 };
 
 const {FULL: formateFull, TIME: formateTime, DAY_MOUNTH: formateDayMounth} = DateFormats;
-export const createPointTemplate = (serverData) => {
-  const {currentType, currentCity, cost, currentOffers, startDate, endDate, duration, isFavorite} = serverData;
+export const createPointTemplate = ({currentType, currentCity, cost, currentOffers, startDate, endDate, duration, isFavorite}) => {
   const fullStartDate = getFormatedDate(startDate, formateFull);
   const timeStartDate = getFormatedDate(startDate, formateTime);
   const fullEndDate = getFormatedDate(endDate, formateFull);
@@ -68,7 +67,7 @@ export const createPointTemplate = (serverData) => {
 class Point extends AbstractView {
   constructor(data) {
     super(data);
-    this._clickHandler = this._clickHandler.bind(this);
+    this._openClickHandler = this._openClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
@@ -76,7 +75,7 @@ class Point extends AbstractView {
     return createPointTemplate(this._data);
   }
 
-  _clickHandler() {
+  _openClickHandler() {
     this._callback.click();
   }
 
@@ -90,9 +89,9 @@ class Point extends AbstractView {
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
-  setClickHandler(callback) {
+  setOpenClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._openClickHandler);
   }
 }
 
