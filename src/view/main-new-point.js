@@ -1,8 +1,7 @@
 import AbstractView from "./abstract";
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
 
-export const createNewPointTemplate = (serverData) => {
-  const {typesList, citiesList, offersList} = serverData;
+export const createNewPointTemplate = ({typesList, citiesList, offersList}) => {
   return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">
