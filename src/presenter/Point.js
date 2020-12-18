@@ -25,11 +25,11 @@ class Point {
     // Режим отображения по умолчанию
     this._mode = Mode.DEFAULT;
     // Привязывание контекста
-    this._clickHandler = this._clickHandler.bind(this);
-    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._openClickHandler = this._openClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
 
-    this._submitHandler = this._submitHandler.bind(this);
-    this._editClickHandler = this._editClickHandler.bind(this);
+    this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
+    this._closeClickHandler = this._closeClickHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -45,10 +45,10 @@ class Point {
     this._pointEditComponent = new PointEditView(point);
 
     // Вешаем обработчики
-    this._pointComponent.setClickHandler(this._clickHandler);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setSubmitHandler(this._submitHandler);
-    this._pointEditComponent.setEditClickHandler(this._editClickHandler);
+    this._pointComponent.setOpenClickHandler(this._openClickHandler);
+    this._pointComponent.setFavoriteClickHandler(this._favoriteClickHandler);
+    this._pointEditComponent.setSubmitHandler(this._btnSubmitHandler);
+    this._pointEditComponent.setCloseClickHandler(this._closeClickHandler);
 
     // Если инициализация первичная - просто рендерим точку
     // Если инициализация повторная, то, в зависимости от режима отображения, обновляем или точку или форму редактирования
@@ -66,6 +66,9 @@ class Point {
     remove(prevPointComponent);
     remove(prevPointEditComponent);
   }
+
+
+  // -------- Основные методы -------- //
 
   // Метод для возращения всех точек в режим отображения по умолчанию
   resetView() {
@@ -95,7 +98,21 @@ class Point {
     this._mode = Mode.DEFAULT;
   }
 
-  // Обработчик нажатия на кнопку ESC
+
+  // -------- Коллбэки -------- //
+
+  // Для открытия формы
+  _openClickHandler() {
+    this._replacePointToForm();
+  }
+
+  // Для закрытия формы без сохранения изменений
+  _closeClickHandler() {
+    this._pointEditComponent.reset(this._point);
+    this._replaceFormToPoint();
+  }
+
+  // Для закрытия формы без сохранения изменений по нажатию ESC
   _escKeyDownHandler(evt) {
     if (evt.key === escapeKey || evt.key === escKey) {
       evt.preventDefault();
@@ -104,27 +121,15 @@ class Point {
     }
   }
 
-  // ---Коллбэки---
-  // Для открытия формы
-  _clickHandler() {
-    this._replacePointToForm();
-  }
-
-  // Для закрытия формы без сохранения изменений
-  _editClickHandler() {
-    this._pointEditComponent.reset(this._point);
-    this._replaceFormToPoint();
-  }
-
   // Для закрытия формы с сохранением измененй
-  _submitHandler(point) {
+  _btnSubmitHandler(point) {
     this._changeData(point);
     this._changeHeader();
     this._replaceFormToPoint();
   }
 
   // Для добавления точки в избранное. В коллбек передаются данные о точке с добавленным свойством isFavorite
-  _handleFavoriteClick() {
+  _favoriteClickHandler() {
     this._changeData(
         Object.assign(
             {},
