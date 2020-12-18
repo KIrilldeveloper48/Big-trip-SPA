@@ -66,8 +66,8 @@ const generateEndDate = (startDate) => {
 };
 
 // Вычисление продолжительности нахождения в точке
-const getTripPointDuration = (startDate, endDate) => {
-  const durationInMinutes = (endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE;
+export const getTripPointDuration = (startDate, endDate) => {
+  const durationInMinutes = Math.floor((endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE);
 
   const numberOfDays = Math.floor(durationInMinutes / MINUTES_PER_DAY);
   const numberOfHours = Math.floor((durationInMinutes - (numberOfDays * MINUTES_PER_DAY)) / MINUTES_PER_HOUR);
