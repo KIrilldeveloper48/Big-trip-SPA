@@ -265,7 +265,7 @@ class EditPoint extends SmartView {
         this.getElement().querySelector(`#event-start-time-1`),
         {
           enableTime: true,
-          time_24hr: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
+          [`time_24hr`]: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
           dateFormat: `d/m/y H:i`,
           defaultDate: this._data.startDate,
           onChange: this._startDateChangeHandler
@@ -276,7 +276,7 @@ class EditPoint extends SmartView {
         this.getElement().querySelector(`#event-end-time-1`),
         {
           enableTime: true,
-          time_24hr: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
+          [`time_24hr`]: true, // Линтер будет ругаться, но только это свойство меняет формат с 12-ти часового на 24
           dateFormat: `d/m/y H:i`,
           defaultDate: this._data.endDate,
           onChange: this._endDateChangeHandler
