@@ -1,9 +1,9 @@
 import {getRandomInteger, getRandomItem} from '../utils/common';
-import {OptionsCount, PossibleCost, POSSIBLE_NAME, TRIP_POINTS_TYPES} from './const';
+import {OptionsCount, PossibleOfferCost, POSSIBLE_NAME, TRIP_POINTS_TYPES} from './const';
 
 const generateListPointOffer = () => {
   const {MIN: minCount, MAX: maxCount} = OptionsCount;
-  const {MIN: minCost, MAX: maxCost} = PossibleCost;
+  const {MIN: minCost, MAX: maxCost} = PossibleOfferCost;
 
   const offersList = [];
 

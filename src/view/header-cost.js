@@ -1,13 +1,25 @@
 import AbstractView from "./abstract.js";
 
+// Получаем итоговую цену для точки исходя из выбранных предложений
+const getPointCost = (offersList, cost) => {
+  if (offersList.length === 0) {
+    return cost;
+  }
+
+  const pointCost = offersList.reduce((result, offer) => {
+    if (offer.checked) {
+      result += offer.cost;
+    }
+    return result;
+  }, cost);
+
+  return pointCost;
+};
+
 // Получаем итоговую цену путешествия
-const getTripCost = (pointsList) => {
-  return pointsList.reduce((result, point) => {
-    point.currentOffers.forEach((offer) => {
-      if (offer.checked) {
-        result += offer.cost;
-      }
-    });
+const getTripCost = (pointList) => {
+  return pointList.reduce((result, point) => {
+    result += getPointCost(point.currentOffers, point.cost);
     return result;
   }, 0);
 };

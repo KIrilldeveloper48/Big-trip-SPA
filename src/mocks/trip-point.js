@@ -1,12 +1,12 @@
 import dayjs from 'dayjs';
 import {getRandomInteger} from '../utils/common';
 
-import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount} from './const';
+import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount, PossiblePointCost} from './const';
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 // Генерация описания для точки
-const generatePointDescr = () => {
+export const generatePointDescr = () => {
   const {MIN: min, MAX: max} = SentenceCount;
   const possiblePointDescr = POINT_DESCR.split(`.`);
 
@@ -22,7 +22,7 @@ const generatePointDescr = () => {
 };
 
 // Генерация списка фотографий для точки
-const generatePointPhotos = () => {
+export const generatePointPhotos = () => {
   const {MIN: min, MAX: max} = PhotoCount;
   const pointPhotos = [];
 
@@ -35,7 +35,7 @@ const generatePointPhotos = () => {
 };
 
 // Получение выбранных опций
-const getCurrentOffers = (currentType) => {
+export const getCurrentOffers = (currentType) => {
   if (OFFERS_LIST[currentType].length === 0) {
     return [];
   }
@@ -66,8 +66,8 @@ const generateEndDate = (startDate) => {
 };
 
 // Вычисление продолжительности нахождения в точке
-const getTripPointDuration = (startDate, endDate) => {
-  const durationInMinutes = (endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE;
+export const getTripPointDuration = (startDate, endDate) => {
+  const durationInMinutes = Math.floor((endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE);
 
   const numberOfDays = Math.floor(durationInMinutes / MINUTES_PER_DAY);
   const numberOfHours = Math.floor((durationInMinutes - (numberOfDays * MINUTES_PER_DAY)) / MINUTES_PER_HOUR);
@@ -90,6 +90,7 @@ const getTripPointDuration = (startDate, endDate) => {
 
 // Генерация структуры данных для точек маршрута, форм создания точки и редактирования
 export const generateTripPoints = () => {
+  const {MIN: minCost, MAX: maxCost} = PossiblePointCost;
   const currentType = TRIP_POINTS_TYPES[getRandomInteger(0, TRIP_POINTS_TYPES.length - 1)];
   const startDate = generateStartDate();
   const endDate = generateEndDate(startDate);
@@ -100,6 +101,7 @@ export const generateTripPoints = () => {
     currentType,
     citiesList: CITIES_LIST,
     currentCity: CITIES_LIST[getRandomInteger(0, CITIES_LIST.length - 1)],
+    cost: getRandomInteger(minCost, maxCost),
     offersList: OFFERS_LIST,
     currentOffers,
     descr: generatePointDescr(),

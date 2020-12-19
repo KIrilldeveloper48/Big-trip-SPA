@@ -1,5 +1,3 @@
-import {getPointCost} from "../view/common-template";
-
 export const sortDate = (a, b) => {
   return a.startDate.getTime() - b.startDate.getTime();
 };
@@ -11,5 +9,5 @@ export const sortTime = (a, b) => {
 };
 
 export const sortPrice = (a, b) => {
-  return getPointCost(b.currentOffers) - getPointCost(a.currentOffers);
+  return b.cost - a.cost;
 };

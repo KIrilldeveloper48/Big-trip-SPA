@@ -14,7 +14,7 @@ import Placeholder from "../view/placeholder";
 import {SORT_LIST, FILTERS_LIST, MENU_LIST, SortType} from '../mocks/const';
 import {generateTripPoints} from '../mocks/trip-point';
 // Всп. функции
-import {render, RenderPosition} from '../utils/render';
+import {render, RenderPosition, remove, replace} from '../utils/render';
 import {updateItem} from "../utils/common";
 import {sortTime, sortPrice, sortDate} from "../utils/sorting";
 // Константы
@@ -34,6 +34,8 @@ class Trip {
     // Изначальный тип сортировки (По дате)
     this._currentSortType = SortType.DEFAULT;
     // Компоненты для отрисовки
+    this._headerInfoComponent = null;
+    this._headerCostComponent = null;
     this._menuComponent = new MenuView(MENU_LIST);
     this._filtersComponent = new FiltersView(FILTERS_LIST);
     this._sortComponent = new SortView(SORT_LIST);
@@ -46,6 +48,7 @@ class Trip {
     this._eventsListHeaderComponent = new HiddenHeader(sortHeader);
     // Привязывание контекста
     this._handlePointChange = this._handlePointChange.bind(this);
+    this._handleHeaderInfoChange = this._handleHeaderInfoChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
@@ -70,14 +73,34 @@ class Trip {
     }
   }
 
+
+  // -------- Рендер -------- //
+
   // Отрисовка информация для цены и маршруте путешествия
   _renderHeaderInfo() {
-    const pointList = this._sortingPoints(this._currentSortType);
-    const mainHeaderElement = this._tripContainer.querySelector(`.trip-main`);
-    render(mainHeaderElement, new InfoView(pointList), RenderPosition.AFTERBEGIN);
+    const pointList = this._getSortedPoints(SortType.DEFAULT);
 
-    const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
-    render(tripInfoElement, new CostView(pointList), RenderPosition.BEFOREEND);
+    const prevHeaderInfoComponent = this._headerInfoComponent;
+    const prevHeaderCostComponent = this._headerCostComponent;
+
+    this._headerInfoComponent = new InfoView(pointList);
+    this._headerCostComponent = new CostView(pointList);
+
+    if (prevHeaderInfoComponent === null || prevHeaderCostComponent === null) {
+      const mainHeaderElement = this._tripContainer.querySelector(`.trip-main`);
+      render(mainHeaderElement, this._headerInfoComponent, RenderPosition.AFTERBEGIN);
+
+      const tripInfoElement = mainHeaderElement.querySelector(`.trip-info`);
+      render(tripInfoElement, this._headerCostComponent, RenderPosition.BEFOREEND);
+      return;
+    } else {
+      replace(this._headerInfoComponent, prevHeaderInfoComponent);
+      const tripInfoElement = this._tripContainer.querySelector(`.trip-info`);
+      render(tripInfoElement, this._headerCostComponent, RenderPosition.BEFOREEND);
+    }
+
+    remove(prevHeaderInfoComponent);
+    remove(prevHeaderCostComponent);
   }
 
   // Отрисовка меню и фильтров
@@ -104,61 +127,14 @@ class Trip {
   // Логика про отрисовке одной точки. Создаём новый экземпляр класса, в параметрнах передаём контейнер для отрисовки и функцию-коллбэк для обновления точки.
   // После каждого вызыва метода записываем новый экземпляр класса в список
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handlePointChange, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handlePointChange, this._handleModeChange, this._handleHeaderInfoChange);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
 
-  // Этот метод обновляет элемент массива и запускает отрисовку обновлённого элемента
-  _handlePointChange(updatedPoint) {
-    this._pointList = updateItem(this._pointList, updatedPoint);
-    this._pointPresenter[updatedPoint.id].init(updatedPoint);
-  }
-  // Этот метод проходится по всем презентарам в списке и у каждого вызывает метод сброса режима отображения
-  _handleModeChange() {
-    Object.values(this._pointPresenter).forEach((presentor) => presentor.resetView());
-  }
-
-  // Метод для назначения типа сортировки точек
-  _setSortingType(sortType) {
-    this._currentSortType = sortType;
-  }
-
-  // Метод для получения отсортированного массива с точками, в зависимости от выбранного типа сортировки
-  _sortingPoints(sortType) {
-    let sortedPoints = this._pointList.slice();
-    switch (sortType) {
-      case SortType.TIME:
-        sortedPoints.sort(sortTime);
-        break;
-      case SortType.PRICE:
-        sortedPoints.sort(sortPrice);
-        break;
-      default:
-        sortedPoints.sort(sortDate);
-    }
-    return sortedPoints;
-  }
-
-  // Коллбэк с логикой для отрисовки отсортированных точек
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-    this._setSortingType(sortType);
-    this._clearPointsList();
-    this._renderPoints();
-  }
-
-  // Удаление списка точек (как в объекте так и в DOM)
-  _clearPointsList() {
-    Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
-    this._pointPresenter = {};
-  }
-
   // Отрисовка всех точек
   _renderPoints() {
-    const pointList = this._sortingPoints(this._currentSortType);
+    const pointList = this._getSortedPoints(this._currentSortType);
     // Отрисовка конетнера, куда будут рендериться точки
     render(this._pointsContainer, this._eventsListComponent, RenderPosition.BEFOREEND);
 
@@ -175,6 +151,60 @@ class Trip {
   // Отрисовка формы для создания новой точки
   _renderNewPointForm() {
     render(this._pointsContainer, this._newPointFormComponent, RenderPosition.BEFOREEND);
+  }
+
+
+  // -------- Вспомогательные методы -------- //
+
+  // Метод для получения отсортированного массива с точками, в зависимости от выбранного типа сортировки
+  _getSortedPoints(sortType) {
+    let sortedPoints = this._pointList.slice();
+    switch (sortType) {
+      case SortType.TIME:
+        sortedPoints.sort(sortTime);
+        break;
+      case SortType.PRICE:
+        sortedPoints.sort(sortPrice);
+        break;
+      default:
+        sortedPoints.sort(sortDate);
+    }
+    return sortedPoints;
+  }
+
+  // Удаление списка точек (как в объекте так и в DOM)
+  _clearPointsList() {
+    Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
+    this._pointPresenter = {};
+  }
+
+
+  // -------- Коллбэки -------- //
+
+  // Логика для отрисовки отсортированных точек
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    this._clearPointsList();
+    this._renderPoints();
+  }
+
+  // Этот метод обновляет элемент массива и запускает отрисовку обновлённого элемента
+  _handlePointChange(updatedPoint) {
+    this._pointList = updateItem(this._pointList, updatedPoint);
+    this._pointPresenter[updatedPoint.id].init(updatedPoint);
+  }
+
+  // Этот метод запускает повторную отрисовку информации о путешествии
+  _handleHeaderInfoChange() {
+    this._renderHeaderInfo();
+  }
+
+  // Этот метод проходится по всем презентарам в списке и у каждого вызывает метод сброса режима отображения
+  _handleModeChange() {
+    Object.values(this._pointPresenter).forEach((presentor) => presentor.resetView());
   }
 }
 
