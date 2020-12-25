@@ -1,6 +1,6 @@
-import Abstract from "./abstract";
+import AbstractView from "./abstract";
 
-class Smart extends Abstract {
+class Smart extends AbstractView {
   constructor() {
     super();
     this._data = {};
