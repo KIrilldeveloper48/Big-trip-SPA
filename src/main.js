@@ -1,8 +1,8 @@
 import {generateTripPoints} from './mocks/trip-point';
-import Trip from "./presenter/Trip";
+import Trip from "./presenter/trip";
 import PointsModel from "./model/points";
 import FilterModel from './model/filter';
-import Filter from './presenter/Filter';
+import Filter from './presenter/filter';
 
 const POINTS_COUNT = 20;
 

@@ -1,11 +1,12 @@
 // Генерация разметки для списка с типом путешествия
-export const generateTypesListTemplate = (typesList) => {
+export const generateTypesListTemplate = (typesList, currentType) => {
   return typesList.reduce((result, type) => {
 
+    const isChecked = type === currentType ? `checked` : ``;
     const typeLowerCase = type.toLowerCase();
 
     result += `<div class="event__type-item">
-                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
                   <label class="event__type-label  event__type-label--${typeLowerCase}" for="event-type-${typeLowerCase}-1">${type}</label>
                 </div>`;
     return result;

@@ -1,5 +1,5 @@
 // Дочерний презентер
-import PointPresenter from "./Point";
+import PointPresenter from "./point";
 // Вьюхи
 import InfoView from "../view/header-info";
 import CostView from "../view/header-cost";

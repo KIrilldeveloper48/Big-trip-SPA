@@ -27,7 +27,7 @@ export const createNewPointTemplate = ({typesList, currentType, citiesList, curr
               <div class="event__type-list">
                 <fieldset class="event__type-group">
                   <legend class="visually-hidden">Event type</legend>
-                 ${generateTypesListTemplate(typesList)}
+                 ${generateTypesListTemplate(typesList, currentType)}
                 </fieldset>
               </div>
             </div>
@@ -84,6 +84,7 @@ class NewPoint extends SmartView {
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._costInputHandler = this._costInputHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
     this._pointTypeChangeHandler = this._pointTypeChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
@@ -122,9 +123,9 @@ class NewPoint extends SmartView {
 
   // -------- Вспомогательные методы -------- //
 
-  _validationCityChange(evt) {
+  _isCityValid(evt) {
     const chosedCity = evt.target.value;
-    return this._data.citiesList.indexOf(chosedCity);
+    return this._data.citiesList.indexOf(chosedCity) >= 0;
   }
 
   // Метод для получения списка доступных опций для конкртеного типа путешествия
@@ -163,15 +164,17 @@ class NewPoint extends SmartView {
 
   _cityChangeHandler(evt) {
     evt.preventDefault();
-    if (this._validationCityChange(evt) >= 0) {
-      this.updateData({
-        currentCity: evt.target.value,
-        descr: generatePointDescr(),
-        photosList: generatePointPhotos()
-      });
+
+    if (this._isCityValid(evt)) {
+      this._cityInputElement.setCustomValidity(cityErrorMessage);
       return;
     }
-    this._cityInputElement.setCustomValidity(cityErrorMessage);
+
+    this.updateData({
+      currentCity: evt.target.value,
+      descr: generatePointDescr(),
+      photosList: generatePointPhotos()
+    });
   }
 
   _offerChangeHandler(evt) {
