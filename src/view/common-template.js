@@ -51,3 +51,26 @@ export const generateOffersListTemplate = (offersList) => {
             </div>
           </section>`;
 };
+
+
+// Генерация разметки для описания точки
+export const generateDestinationTemplate = (photos, descr) => {
+  if (photos.length === 0 && descr.length === 0) {
+    return ``;
+  }
+
+  const photosList = photos.reduce((result, photo) => {
+    result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
+    return result;
+  }, ``);
+
+  return `<section class="event__section  event__section--destination">
+            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${descr}</p>
+            <div class="event__photos-container">
+              <div class="event__photos-tape">
+                ${photosList}
+              </div>
+            </div>
+          </section>`;
+};

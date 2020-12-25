@@ -3,7 +3,7 @@ import {getRandomInteger} from '../utils/common';
 
 import {TRIP_POINTS_TYPES, CITIES_LIST, OFFERS_LIST, POINT_DESCR, MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR, SentenceCount, PhotoCount, PossiblePointCost} from './const';
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 // Генерация описания для точки
 export const generatePointDescr = () => {
@@ -55,7 +55,8 @@ export const getCurrentOffers = (currentType) => {
 const generateStartDate = () => {
   const maxHoursGap = 30 * 24;
   const hoursGap = getRandomInteger(0, maxHoursGap);
-  return dayjs().add(hoursGap, `hour`).toDate();
+  const startDate = new Date().getTime() - MLSECONDS_PER_MINUTE * MINUTES_PER_DAY * 15;
+  return dayjs(startDate).add(hoursGap, `hour`).toDate();
 };
 
 // Генерация конечной даты
