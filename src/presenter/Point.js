@@ -2,7 +2,7 @@ import PointEditView from "../view/main-edit-point";
 import PointView from "../view/main-point";
 
 import {render, RenderPosition, replace, remove} from '../utils/render';
-import {Keys} from '../const';
+import {Keys, UpdateType, UserAction} from '../const';
 
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 const Mode = {
@@ -11,12 +11,11 @@ const Mode = {
 };
 
 class Point {
-  constructor(pointContainer, changeData, changeMode, changeHeader) {
+  constructor(pointContainer, changeData, changeMode) {
     // Контейнер для отрисовки точек
     this._pointContainerElement = pointContainer.getElement();
     // Метод для отображения изменённых данных
     this._changeData = changeData;
-    this._changeHeader = changeHeader;
     // Метод для смены режима отображения с editing на default
     this._changeMode = changeMode;
     // Эти свойства нужны для отслеживания состояния точки и формы редактирования - отрисованы они или нет
@@ -29,6 +28,7 @@ class Point {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
 
     this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
@@ -49,6 +49,7 @@ class Point {
     this._pointComponent.setFavoriteClickHandler(this._favoriteClickHandler);
     this._pointEditComponent.setSubmitHandler(this._btnSubmitHandler);
     this._pointEditComponent.setCloseClickHandler(this._closeClickHandler);
+    this._pointEditComponent.setDeleteClickHandler(this._deleteClickHandler);
 
     // Если инициализация первичная - просто рендерим точку
     // Если инициализация повторная, то, в зависимости от режима отображения, обновляем или точку или форму редактирования
@@ -123,14 +124,28 @@ class Point {
 
   // Для закрытия формы с сохранением измененй
   _btnSubmitHandler(point) {
-    this._changeData(point);
-    this._changeHeader();
+    this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.MAJOR,
+        point
+    );
     this._replaceFormToPoint();
+  }
+
+  // Для удаления точки
+  _deleteClickHandler(point) {
+    this._changeData(
+        UserAction.DELETE_POINT,
+        UpdateType.MAJOR,
+        point
+    );
   }
 
   // Для добавления точки в избранное. В коллбек передаются данные о точке с добавленным свойством isFavorite
   _favoriteClickHandler() {
     this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._point,

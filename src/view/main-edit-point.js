@@ -1,39 +1,21 @@
-import SmartView from "./smart";
-
-import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate} from "./common-template";
-import {generatePointDescr, generatePointPhotos, getTripPointDuration} from './../mocks/trip-point';
-
-import {getFormatedDate} from "../utils/common";
-import {DateFormats} from "../const";
-import {OFFERS_LIST} from "../mocks/const";
+import he from "he";
 import flatpickr from "flatpickr";
-
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-// Генерация разметки для описания точки
-const generateDestinationTemplate = (photos, descr) => {
-  if (photos.length === 0 && descr.length === 0) {
-    return ``;
-  }
+import SmartView from "./smart";
 
-  const photosList = photos.reduce((result, photo) => {
-    result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
-    return result;
-  }, ``);
+import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
+import {generatePointDescr, generatePointPhotos, getTripPointDuration} from './../mocks/trip-point';
 
-  return `<section class="event__section  event__section--destination">
-            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${descr}</p>
-            <div class="event__photos-container">
-              <div class="event__photos-tape">
-                ${photosList}
-              </div>
-            </div>
-          </section>`;
-};
+import {DateFormats, cityErrorMessage} from "../const";
+import {OFFERS_LIST} from "../mocks/const";
+import {getFormatedDate} from "../utils/common";
+
 
 const {FULL_TIME: formateFullTime} = DateFormats;
+
 const createEditPointTemplate = ({typesList, currentType, citiesList, cost, currentCity, currentOffers, descr, photosList, startDate, endDate}) => {
+  const costToString = String(cost);
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -47,7 +29,7 @@ const createEditPointTemplate = ({typesList, currentType, citiesList, cost, curr
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${generateTypesListTemplate(typesList)}
+                    ${generateTypesListTemplate(typesList, currentType)}
                   </fieldset>
                 </div>
               </div>
@@ -56,7 +38,7 @@ const createEditPointTemplate = ({typesList, currentType, citiesList, cost, curr
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${currentType}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${currentCity}" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1">
                 <datalist id="destination-list-1">
                   ${generateCitiesListTemplate(citiesList)}
                 </datalist>
@@ -75,7 +57,7 @@ const createEditPointTemplate = ({typesList, currentType, citiesList, cost, curr
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -97,11 +79,14 @@ class EditPoint extends SmartView {
   constructor(data) {
     super(data);
     this._data = EditPoint.parseDataToUpdatedDate(data);
+    this._cityInputElement = this.getElement().querySelector(`.event__input--destination`);
+
     this.startDatepicker = null;
     this.endDatepicker = null;
 
     // Привязывание контекста
     this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._pointTypeChangeHandler = this._pointTypeChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
@@ -112,7 +97,6 @@ class EditPoint extends SmartView {
 
     // Навешиваем обработчики на выбор типа, города и изменение стоимости
     this._setInnerHandlers();
-    this._setDatepicker();
   }
 
 
@@ -135,6 +119,28 @@ class EditPoint extends SmartView {
     this.updateData(
         EditPoint.parseDataToUpdatedDate(data)
     );
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatepicker || this._endtDatepicker) {
+      this._removeDatepicker();
+    }
+  }
+
+  _removeDatepicker() {
+    this._startDatepicker.destroy();
+    this._endDatepicker.destroy();
+    this._startDatepicker = null;
+    this._endDatepicker = null;
+  }
+
+  // -------- Вспомогательные методы -------- //
+
+  _isCityValid(evt) {
+    const chosedCity = evt.target.value;
+    return this._data.citiesList.indexOf(chosedCity) >= 0;
   }
 
   // Метод для получения списка доступных опций для конкртеного типа путешествия
@@ -167,6 +173,12 @@ class EditPoint extends SmartView {
 
   _cityChangeHandler(evt) {
     evt.preventDefault();
+
+    if (this._isCityValid(evt)) {
+      this._cityInputElement.setCustomValidity(cityErrorMessage);
+      return;
+    }
+
     this.updateData({
       currentCity: evt.target.value,
       descr: generatePointDescr(),
@@ -202,6 +214,7 @@ class EditPoint extends SmartView {
   }
 
   _startDateChangeHandler([userDate]) {
+    this._endDatepicker.config.minDate = userDate;
 
     this.updateData({
       startDate: userDate,
@@ -210,11 +223,17 @@ class EditPoint extends SmartView {
   }
 
   _endDateChangeHandler([userDate]) {
+    this._startDatepicker.config.maxDate = userDate;
 
     this.updateData({
       endDate: userDate,
       duration: getTripPointDuration(this._data.startDate, userDate)
     }, true);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPoint.parseDataToUpdatedDate(this._data));
   }
 
   // -------- Установка обработчиков -------- //
@@ -227,6 +246,11 @@ class EditPoint extends SmartView {
   setCloseClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   _setOffersChangeHandler() {
@@ -247,18 +271,16 @@ class EditPoint extends SmartView {
   }
 
   _setInnerHandlers() {
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityChangeHandler);
+    this._cityInputElement.addEventListener(`change`, this._cityChangeHandler);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._costInputHandler);
     this._setPointTypeChangeHandler();
     this._setOffersChangeHandler();
+    this._setDatepicker();
   }
 
   _setDatepicker() {
     if (this._startDatepicker || this._endtDatepicker) {
-      this._startDatepicker.destroy();
-      this._endDatepicker.destroy();
-      this._startDatepicker = null;
-      this._endDatepicker = null;
+      this._removeDatepicker();
     }
 
     this._startDatepicker = flatpickr(
@@ -268,7 +290,8 @@ class EditPoint extends SmartView {
           [`time_24hr`]: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._data.startDate,
-          onChange: this._startDateChangeHandler
+          onChange: this._startDateChangeHandler,
+          maxDate: this._data.endDate
         }
     );
 
@@ -279,7 +302,8 @@ class EditPoint extends SmartView {
           [`time_24hr`]: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._data.endDate,
-          onChange: this._endDateChangeHandler
+          onChange: this._endDateChangeHandler,
+          minDate: this._data.startDate
         }
     );
   }

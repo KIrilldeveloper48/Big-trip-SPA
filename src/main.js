@@ -1,5 +1,8 @@
 import {generateTripPoints} from './mocks/trip-point';
-import Trip from "./presenter/Trip";
+import Trip from "./presenter/trip";
+import PointsModel from "./model/points";
+import FilterModel from './model/filter';
+import Filter from './presenter/filter';
 
 const POINTS_COUNT = 20;
 
@@ -15,8 +18,22 @@ const getPointList = () => {
 
 const pointsList = getPointList();
 
+// Модели
+const pointsModel = new PointsModel();
+pointsModel.setPoints(pointsList);
+
+const filterModel = new FilterModel();
+
 const siteMainElement = document.querySelector(`.page-body`);
+const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
 
-const tripPresenter = new Trip(siteMainElement);
+const filterPresenter = new Filter(tripControlsElement, filterModel, pointsModel);
+const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel);
 
-tripPresenter.init(pointsList);
+tripPresenter.init();
+filterPresenter.init();
+
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripPresenter.createPoint();
+});

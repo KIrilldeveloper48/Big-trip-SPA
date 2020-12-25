@@ -1,11 +1,12 @@
 // Генерация разметки для списка с типом путешествия
-export const generateTypesListTemplate = (typesList) => {
+export const generateTypesListTemplate = (typesList, currentType) => {
   return typesList.reduce((result, type) => {
 
+    const isChecked = type === currentType ? `checked` : ``;
     const typeLowerCase = type.toLowerCase();
 
     result += `<div class="event__type-item">
-                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
                   <label class="event__type-label  event__type-label--${typeLowerCase}" for="event-type-${typeLowerCase}-1">${type}</label>
                 </div>`;
     return result;
@@ -48,6 +49,29 @@ export const generateOffersListTemplate = (offersList) => {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
               ${offersListTemplate}
+            </div>
+          </section>`;
+};
+
+
+// Генерация разметки для описания точки
+export const generateDestinationTemplate = (photos, descr) => {
+  if (photos.length === 0 && descr.length === 0) {
+    return ``;
+  }
+
+  const photosList = photos.reduce((result, photo) => {
+    result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
+    return result;
+  }, ``);
+
+  return `<section class="event__section  event__section--destination">
+            <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+            <p class="event__destination-description">${descr}</p>
+            <div class="event__photos-container">
+              <div class="event__photos-tape">
+                ${photosList}
+              </div>
             </div>
           </section>`;
 };

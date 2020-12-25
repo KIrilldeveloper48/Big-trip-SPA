@@ -1,3 +1,4 @@
+import he from "he";
 import {DateFormats} from "../const";
 import {getFormatedDate} from "../utils/common";
 import AbstractView from "./abstract";
@@ -28,6 +29,7 @@ export const createPointTemplate = ({currentType, currentCity, cost, currentOffe
   const fullEndDate = getFormatedDate(endDate, formateFull);
   const timeEndDate = getFormatedDate(endDate, formateTime);
   const favorite = isFavorite ? `event__favorite-btn--active` : ``;
+  const costInString = String(cost);
 
   return `<li class="trip-events__item">
           <div class="event">
@@ -35,7 +37,7 @@ export const createPointTemplate = ({currentType, currentCity, cost, currentOffe
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
             </div>
-            <h3 class="event__title">${currentType} ${currentCity}</h3>
+            <h3 class="event__title">${currentType} ${he.encode(currentCity)}</h3>
             <div class="event__schedule">
               <p class="event__time">
                 <time class="event__start-time" datetime="${fullStartDate + `T` + timeStartDate}">${timeStartDate}</time>
@@ -45,7 +47,7 @@ export const createPointTemplate = ({currentType, currentCity, cost, currentOffe
               <p class="event__duration">${duration}</p>
             </div>
             <p class="event__price">
-              &euro;&nbsp;<span class="event__price-value">${cost}</span>
+              &euro;&nbsp;<span class="event__price-value">${he.encode(costInString)}</span>
             </p>
             <h4 class="visually-hidden">Offers:</h4>
             <ul class="event__selected-offers">
