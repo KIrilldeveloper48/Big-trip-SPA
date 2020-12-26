@@ -37,8 +37,8 @@ class Trip {
     // Компоненты для отрисовки
     this._headerInfoComponent = null;
     this._headerCostComponent = null;
+    this._sortComponent = null;
     this._menuComponent = new MenuView(MENU_LIST);
-    this._sortComponent = new SortView(SORT_LIST);
     this._noPointComponent = new Placeholder();
     this._eventsListComponent = new EventsListContainer();
     // Скрытые заголовки
@@ -107,6 +107,11 @@ class Trip {
     this._pointPresenter = {};
   }
 
+  _clearListAndSort() {
+    this._clearPointsList();
+    remove(this._sortComponent);
+  }
+
 
   // -------- Рендер -------- //
 
@@ -144,8 +149,11 @@ class Trip {
     render(tripControlsElement, this._menuComponent, RenderPosition.AFTERBEGIN);
     render(tripControlsElement, this._menuHeaderComponent, RenderPosition.AFTERBEGIN);
   }
+
   // Отрисовка сортировки
   _renderSort() {
+    this._sortComponent = new SortView(SORT_LIST, this._currentSortType);
+
     render(this._pointsContainer, this._sortComponent, RenderPosition.BEFOREEND);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
@@ -186,6 +194,11 @@ class Trip {
     }
   }
 
+  _renderListAndSort() {
+    this._renderSort();
+    this._renderPoints();
+  }
+
   // -------- Коллбэки -------- //
 
   // Логика для отрисовки отсортированных точек
@@ -194,8 +207,8 @@ class Trip {
       return;
     }
     this._currentSortType = sortType;
-    this._clearPointsList();
-    this._renderPoints();
+    this._clearListAndSort();
+    this._renderListAndSort();
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -211,7 +224,6 @@ class Trip {
       case UserAction.DELETE_POINT:
         this._pointsModel.deletePoint(updateType, update);
     }
-
   }
 
   _handleModelEvent(updateType, data) {
@@ -221,8 +233,8 @@ class Trip {
         break;
       case UpdateType.MINOR:
         this._currentSortType = SortType.DEFAULT;
-        this._clearPointsList();
-        this._renderPoints();
+        this._clearListAndSort();
+        this._renderListAndSort();
         break;
       case UpdateType.MAJOR:
         this._clearPointsList();
