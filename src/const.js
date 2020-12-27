@@ -39,5 +39,16 @@ export const FilterType = {
   PAST: `past`
 };
 
+export const MenuItem = {
+  TABLE: `Table`,
+  STATS: `Stats`,
+  ADD_NEW_POINT: `add-new-point`
+};
+
+export const BAR_HEIGHT = 55;
+
+export const MLSECONDS_PER_MINUTE = 1000 * 60;
+export const MINUTES_PER_DAY = 1440;
+
 export const cityErrorMessage = `The city you specified is not available. Please select a city from the list.`;
 

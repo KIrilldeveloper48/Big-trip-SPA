@@ -21,7 +21,7 @@ export const SortType = {
 };
 export const PossiblePointCost = {
   MIN: 0,
-  MAX: 200
+  MAX: 500
 };
 export const PossibleOfferCost = {
   MIN: 5,

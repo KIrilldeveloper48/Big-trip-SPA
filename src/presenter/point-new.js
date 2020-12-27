@@ -11,13 +11,15 @@ class PointNew {
     this._changeData = changeData;
 
     this._newPointComponent = null;
+    this._destroyCallback = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init() {
+  init(callback) {
+    this._destroyCallback = callback;
     if (this._newPointComponent !== null) {
       return;
     }
@@ -34,6 +36,10 @@ class PointNew {
   destroy() {
     if (this._newPointComponent === null) {
       return;
+    }
+
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
     }
     remove(this._newPointComponent);
     this._newPointComponent = null;
