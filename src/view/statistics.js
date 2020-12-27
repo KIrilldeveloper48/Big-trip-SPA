@@ -1,19 +1,20 @@
 import SmartView from "./smart";
 import Chart from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import {BAR_HEIGHT} from './../const';
+import {BAR_HEIGHT, CHART_DATA_TYPE, ChartSymbols} from './../const';
 import {getTypesUniq, getChartsData} from "../utils/statistics";
 
-const renderMoneyChart = (moneyCtx, typeList, data) => {
-  moneyCtx.height = BAR_HEIGHT * (typeList.length - 1);
+const {MONEY: moneySymbol, TYPE: typeSymbol, TIME_SPEND: timeSpendSymbol} = ChartSymbols;
 
-  return new Chart(moneyCtx, {
+const renderChart = (ctx, chartType, typeList, data, prefix, suffix = ``) => {
+  ctx.height = BAR_HEIGHT * (typeList.length - 1);
+  return new Chart(ctx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: typeList,
       datasets: [{
-        data: data.MONEY,
+        data,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
@@ -28,149 +29,12 @@ const renderMoneyChart = (moneyCtx, typeList, data) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `€ ${val}`
+          formatter: (val) => `${suffix}${val}${prefix}`
         }
       },
       title: {
         display: true,
-        text: `MONEY`,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          barThickness: 44,
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          minBarLength: 50
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false,
-      }
-    }
-  });
-};
-
-const renderTypeChart = (typeCtx, typeList, data) => {
-  typeCtx.height = BAR_HEIGHT * (typeList.length - 1);
-
-  return new Chart(typeCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: typeList,
-      datasets: [{
-        data: data.TYPE,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
-      }]
-    },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 13
-          },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
-          formatter: (val) => `${val}x`
-        }
-      },
-      title: {
-        display: true,
-        text: `TYPE`,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          barThickness: 44,
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          minBarLength: 50
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false,
-      }
-    }
-  });
-};
-
-const renderTimeSpendChart = (TimeSpendCtx, typeList, data) => {
-  TimeSpendCtx.height = BAR_HEIGHT * (typeList.length - 1);
-  return new Chart(TimeSpendCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: typeList,
-      datasets: [{
-        data: data.TIME_SPEND,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
-      }]
-    },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 13
-          },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
-          formatter: (val) => `${val}D`
-        }
-      },
-      title: {
-        display: true,
-        text: `TYPE`,
+        text: chartType,
         fontColor: `#000000`,
         fontSize: 23,
         position: `left`
@@ -248,26 +112,31 @@ class Statistics extends SmartView {
   removeElement() {
     super.removeElement();
     if (this._moneyChart !== null || this._typeChart !== null || this._timeSpendChart !== null) {
-      this._moneyChart = null;
-      this._typeChart = null;
-      this._timeSpendChart = null;
+      this._removeCharts();
     }
+  }
+
+  _removeCharts() {
+    this._moneyChart.destroy();
+    this._typeChart.destroy();
+    this._timeSpendChart.destroy();
+    this._moneyChart = null;
+    this._typeChart = null;
+    this._timeSpendChart = null;
   }
 
   _setCharts() {
     if (this._moneyChart !== null || this._typeChart !== null || this._timeSpendChart !== null) {
-      this._moneyChart = null;
-      this._typeChart = null;
-      this._timeSpendChart = null;
+      this._removeCharts();
     }
 
     const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
     const typeCtx = this.getElement().querySelector(`.statistics__chart--transport`);
     const timeSpendCtx = this.getElement().querySelector(`.statistics__chart--time`);
 
-    this._moneyChart = renderMoneyChart(moneyCtx, this._typesUniq, this._chartsData);
-    this._typeChart = renderTypeChart(typeCtx, this._typesUniq, this._chartsData);
-    this._timeSpendChart = renderTimeSpendChart(timeSpendCtx, this._typesUniq, this._chartsData);
+    this._moneyChart = renderChart(moneyCtx, [CHART_DATA_TYPE.MONEY], this._typesUniq, this._chartsData[CHART_DATA_TYPE.MONEY], ``, moneySymbol);
+    this._typeChart = renderChart(typeCtx, [CHART_DATA_TYPE.TYPE], this._typesUniq, this._chartsData[CHART_DATA_TYPE.TYPE], typeSymbol);
+    this._timeSpendChart = renderChart(timeSpendCtx, [CHART_DATA_TYPE.TIME_SPEND], this._typesUniq, this._chartsData[CHART_DATA_TYPE.TIME_SPEND], timeSpendSymbol);
   }
 }
 
