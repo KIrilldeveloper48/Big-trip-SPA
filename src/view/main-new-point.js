@@ -13,7 +13,7 @@ import {OFFERS_LIST} from "../mocks/const";
 
 const {FULL_TIME: formateFullTime} = DateFormats;
 
-export const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate}) => {
+const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate}) => {
   return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">

@@ -3,24 +3,20 @@ import PointPresenter from "./point";
 // Вьюхи
 import InfoView from "../view/header-info";
 import CostView from "../view/header-cost";
-import MenuView from "../view/header-menu";
 import SortView from "../view/main-sort";
 import EventsListContainer from "../view/main-list-events";
 import HiddenHeader from '../view/hidden-header';
 import Placeholder from "../view/placeholder";
 // Моковые данные
-import {SORT_LIST, MENU_LIST, SortType} from '../mocks/const';
+import {SORT_LIST, SortType} from '../mocks/const';
 // Всп. функции
 import {render, RenderPosition, remove, replace} from '../utils/render';
 import {sortTime, sortPrice, sortDate} from "../utils/sorting";
 import {filter} from "../utils/filter.js";
 // Константы
-import {FilterType, HiddenHeaderList, UpdateType, UserAction} from '../const';
+import {HiddenHeaderList, UpdateType, UserAction} from '../const';
 import PointNewPresenter from "./point-new";
 import {generateTripPoints} from "../mocks/trip-point";
-
-const {MENU: menuHeader, SORT: sortHeader} = HiddenHeaderList;
-
 
 class Trip {
   constructor(tripContainer, pointsModel, filterModel) {
@@ -37,13 +33,12 @@ class Trip {
     // Компоненты для отрисовки
     this._headerInfoComponent = null;
     this._headerCostComponent = null;
-    this._menuComponent = new MenuView(MENU_LIST);
-    this._sortComponent = new SortView(SORT_LIST);
+    this._sortComponent = null;
     this._noPointComponent = new Placeholder();
     this._eventsListComponent = new EventsListContainer();
     // Скрытые заголовки
-    this._menuHeaderComponent = new HiddenHeader(menuHeader);
-    this._eventsListHeaderComponent = new HiddenHeader(sortHeader);
+
+    this._eventsListHeaderComponent = new HiddenHeader(HiddenHeaderList.SORT);
 
     // Привязывание контекста
     this._handlePointChange = this._handlePointChange.bind(this);
@@ -52,8 +47,6 @@ class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._pointsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
 
     this._pointNewPresenter = new PointNewPresenter(generateTripPoints(), this._eventsListComponent, this._handleViewAction);
   }
@@ -61,8 +54,8 @@ class Trip {
 
   // -------- Инициализация -------- //
   init() {
-    // Отрисовываем менюшку
-    this._renderHeaderControls();
+    this._pointsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
     // Отрисовываем скрытый заголовок для контентной части
     this._renderH2ForTripEvents();
 
@@ -79,10 +72,15 @@ class Trip {
 
 
   // -------- Вспомогательные методы -------- //
-  createPoint() {
+  destroy() {
     this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
-    this._pointNewPresenter.init();
+    this._clearListAndSort();
+    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createPoint(callback) {
+    this._pointNewPresenter.init(callback);
   }
 
   _getPoints() {
@@ -105,6 +103,11 @@ class Trip {
     this._pointNewPresenter.destroy();
     Object.values(this._pointPresenter).forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
+  }
+
+  _clearListAndSort() {
+    this._clearPointsList();
+    remove(this._sortComponent);
   }
 
 
@@ -137,15 +140,10 @@ class Trip {
     remove(prevHeaderCostComponent);
   }
 
-  // Отрисовка меню
-  _renderHeaderControls() {
-    const tripControlsElement = this._tripContainer.querySelector(`.trip-controls`);
-
-    render(tripControlsElement, this._menuComponent, RenderPosition.AFTERBEGIN);
-    render(tripControlsElement, this._menuHeaderComponent, RenderPosition.AFTERBEGIN);
-  }
   // Отрисовка сортировки
   _renderSort() {
+    this._sortComponent = new SortView(SORT_LIST, this._currentSortType);
+
     render(this._pointsContainer, this._sortComponent, RenderPosition.BEFOREEND);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
@@ -186,6 +184,11 @@ class Trip {
     }
   }
 
+  _renderListAndSort() {
+    this._renderSort();
+    this._renderPoints();
+  }
+
   // -------- Коллбэки -------- //
 
   // Логика для отрисовки отсортированных точек
@@ -194,8 +197,8 @@ class Trip {
       return;
     }
     this._currentSortType = sortType;
-    this._clearPointsList();
-    this._renderPoints();
+    this._clearListAndSort();
+    this._renderListAndSort();
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -211,7 +214,6 @@ class Trip {
       case UserAction.DELETE_POINT:
         this._pointsModel.deletePoint(updateType, update);
     }
-
   }
 
   _handleModelEvent(updateType, data) {
@@ -221,8 +223,8 @@ class Trip {
         break;
       case UpdateType.MINOR:
         this._currentSortType = SortType.DEFAULT;
-        this._clearPointsList();
-        this._renderPoints();
+        this._clearListAndSort();
+        this._renderListAndSort();
         break;
       case UpdateType.MAJOR:
         this._clearPointsList();

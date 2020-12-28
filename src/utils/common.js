@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {MLSECONDS_PER_MINUTE} from '../const';
 
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -16,4 +17,8 @@ export const getRandomItem = (items) => {
 
 export const getFormatedDate = (date, format) => {
   return dayjs(date).format(format);
+};
+
+export const durationInMinutes = (startDate, endDate) => {
+  return Math.floor((endDate.getTime() - startDate.getTime()) / MLSECONDS_PER_MINUTE);
 };
