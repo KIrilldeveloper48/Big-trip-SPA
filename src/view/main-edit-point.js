@@ -146,7 +146,8 @@ class EditPoint extends SmartView {
   }
 
   _getOffers(currentType) {
-    return this._offerList[currentType].length === 0
+
+    return this._offerList.length === 0 || this._offerList[currentType].length === 0
       ? []
       : this._offerList[currentType];
   }
