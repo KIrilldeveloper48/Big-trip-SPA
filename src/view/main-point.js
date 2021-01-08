@@ -1,8 +1,9 @@
 import he from "he";
-import {DateFormats} from "../const";
-import {getFormatedDate} from "../utils/common";
+
 import AbstractView from "./abstract";
 
+import {getFormatedDate} from "../utils/common";
+import {DateFormats} from "../const";
 
 // Генерация разметки для выбранных предложений в точке
 const createOffersListTemplate = (offersList) => {
@@ -13,9 +14,9 @@ const createOffersListTemplate = (offersList) => {
   return offersList.reduce((result, offer) => {
     if (offer.checked) {
       result += `<li class="event__offer">
-                  <span class="event__offer-title">${offer.name}</span>
+                  <span class="event__offer-title">${offer.title}</span>
                   &plus;&euro;&nbsp;
-                  <span class="event__offer-price">${offer.cost}</span>
+                  <span class="event__offer-price">${offer.price}</span>
                 </li>`;
     }
     return result;

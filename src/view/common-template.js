@@ -1,13 +1,15 @@
+import {ucFirst} from "../utils/common";
+
 // Генерация разметки для списка с типом путешествия
 export const generateTypesListTemplate = (typesList, currentType) => {
   return typesList.reduce((result, type) => {
 
     const isChecked = type === currentType ? `checked` : ``;
-    const typeLowerCase = type.toLowerCase();
+    const formatedType = ucFirst(type);
 
     result += `<div class="event__type-item">
-                  <input id="event-type-${typeLowerCase}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
-                  <label class="event__type-label  event__type-label--${typeLowerCase}" for="event-type-${typeLowerCase}-1">${type}</label>
+                  <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
+                  <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${formatedType}</label>
                 </div>`;
     return result;
   }, ``);
@@ -15,31 +17,32 @@ export const generateTypesListTemplate = (typesList, currentType) => {
 
 // Генерация разметки для списка городов
 export const generateCitiesListTemplate = (citiesList) => {
-  return citiesList.reduce((result, city) => {
-    result += `<option value="${city}"></option>`;
-    return result;
-  }, ``);
+  return citiesList.length === 0
+    ? ``
+    : citiesList.reduce((result, city) => {
+      result += `<option value="${city}"></option>`;
+      return result;
+    }, ``);
 };
 
 // Генерация разметки для списка доступных доп. опций конкретной точки
-export const generateOffersListTemplate = (offersList) => {
-  if (offersList.length === 0) {
+export const generateOffersListTemplate = (offerList) => {
+  if (offerList.length === 0) {
     return ``;
   }
-
-  const offersListTemplate = offersList.reduce((result, offer) => {
+  const offersListTemplate = offerList.reduce((result, offer) => {
     const isChecked = offer.checked ? `checked` : ``;
-    const offerName = offer.name.toLowerCase().replace(/ /g, `-`); // Первый параметр передаваемы в replace обозначает замену ВСЕХ подходящих подстрок (в нашем случае пробелов), а не только первое вхождение
+    const offerName = offer.title.toLowerCase().replace(/ /g, `-`); // Первый параметр передаваемы в replace обозначает замену ВСЕХ подходящих подстрок (в нашем случае пробелов), а не только первое вхождение
     const offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
-                                    id="event-offer-${offerName}-1" type="checkbox" 
-                                    name="event-offer-${offerName}" data-value="${offer.name}" ${isChecked}>`;
+                                      id="event-offer-${offerName}-1" type="checkbox" 
+                                      name="event-offer-${offerName}" data-value="${offer.title}" ${isChecked}>`;
 
     result += `<div class="event__offer-selector">
                 ${offersListInputTemplate}
                 <label class="event__offer-label" for="event-offer-${offerName}-1">
-                  <span class="event__offer-title">${offer.name}</span>
+                  <span class="event__offer-title">${offer.title}</span>
                   &plus;&euro;&nbsp;
-                  <span class="event__offer-price">${offer.cost}</span>
+                  <span class="event__offer-price">${offer.price}</span>
                 </label>
               </div>`;
     return result;
@@ -61,7 +64,7 @@ export const generateDestinationTemplate = (photos, descr) => {
   }
 
   const photosList = photos.reduce((result, photo) => {
-    result += `<img class="event__photo" src="${photo}" alt="Event photo">`;
+    result += `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`;
     return result;
   }, ``);
 

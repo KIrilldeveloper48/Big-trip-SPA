@@ -1,26 +1,26 @@
 import flatpickr from "flatpickr";
 import he from "he";
+
 import SmartView from "./smart";
 
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
-import {generatePointDescr, generatePointPhotos, getTripPointDuration} from './../mocks/trip-point';
-
-import {getFormatedDate} from "../utils/common";
-
-import {DateFormats, cityErrorMessage} from "../const";
-import {OFFERS_LIST} from "../mocks/const";
+import {getFormatedDate, ucFirst, getOffersForPoint, getFullDuration} from "../utils/common";
+import {DateFormats, cityErrorMessage, typesList} from "../const";
 
 
 const {FULL_TIME: formateFullTime} = DateFormats;
 
-const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity, currentOffers, descr, photosList, startDate, endDate}) => {
+const createNewPointTemplate = (data, offerList, citiesList) => {
+  const {cost, currentType, currentCity, descr, photosList, startDate, endDate} = data;
+  const costToString = String(cost);
+
   return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">
             <div class="event__type-wrapper">
               <label class="event__type  event__type-btn" for="event-type-toggle-1">
                 <span class="visually-hidden">Choose event type</span>
-                  <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType.toLowerCase()}.png" alt="Event type icon">
+                  <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType}.png" alt="Event type icon">
               </label>
               <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -34,7 +34,7 @@ const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity
 
             <div class="event__field-group  event__field-group--destination">
               <label class="event__label  event__type-output" for="event-destination-1">
-                ${currentType}
+                ${ucFirst(currentType)}
               </label>
               <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1">
               <datalist id="destination-list-1">
@@ -55,14 +55,14 @@ const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity
                 <span class="visually-hidden">Price</span>
                 &euro;
               </label>
-              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(`0`)}">
+              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}">
             </div>
 
             <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
             <button class="event__reset-btn" type="reset">Cancel</button>
           </header>
           <section class="event__details">
-            ${generateOffersListTemplate(currentOffers)}
+            ${generateOffersListTemplate(offerList)}
             
             ${generateDestinationTemplate(photosList, descr)}
           </section>
@@ -71,15 +71,21 @@ const createNewPointTemplate = ({typesList, currentType, citiesList, currentCity
 };
 
 class NewPoint extends SmartView {
-  constructor(data) {
-    super(data);
-    this._data = NewPoint.parseDataToUpdatedDate(data);
+  constructor(offerList, destinations) {
+    super();
+    this._data = NewPoint.getPlaceholderData();
+
+    this._destinations = destinations;
+    this._offerList = offerList;
+    this._citiesList = this._getCitiesList();
+
+    this._offersForPoint = getOffersForPoint(this._data.currentOffers, this._offerList, this._data.currentType);
+
     this._cityInputElement = this.getElement().querySelector(`.event__input--destination`);
 
     this.startDatepicker = null;
     this.endDatepicker = null;
 
-    // Привязывание контекста
     this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
     this._costInputHandler = this._costInputHandler.bind(this);
@@ -89,14 +95,13 @@ class NewPoint extends SmartView {
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
-    // Навешиваем обработчики на выбор типа, города и изменение стоимости
     this._setInnerHandlers();
   }
 
   // -------- Основные методы -------- //
 
   getTemplate() {
-    return createNewPointTemplate(this._data);
+    return createNewPointTemplate(this._data, this._offersForPoint, this._citiesList);
   }
 
   restoreHandlers() {
@@ -123,24 +128,50 @@ class NewPoint extends SmartView {
 
   // -------- Вспомогательные методы -------- //
 
-  _isCityValid(evt) {
-    const chosedCity = evt.target.value;
-    return this._data.citiesList.indexOf(chosedCity) >= 0;
+  _isCityValid(city) {
+    return this._citiesList.indexOf(city) >= 0;
   }
 
-  // Метод для получения списка доступных опций для конкртеного типа путешествия
   _getOffers(currentType) {
-    if (OFFERS_LIST[currentType].length === 0) {
-      return [];
+    return this._offerList[currentType].length === 0
+      ? []
+      : this._offerList[currentType];
+  }
+
+  _getCitiesList() {
+    return this._destinations.length === 0
+      ? []
+      : this._destinations.map((destination) => destination.name);
+  }
+
+  _getPointDestination(city) {
+
+    const pointDestination = {
+      descr: ``,
+      photos: []
+    };
+
+    for (let item of this._destinations) {
+      if (item.name === city) {
+        pointDestination.descr = item.description;
+        pointDestination.photos = item.pictures;
+        return pointDestination;
+      }
     }
-    return OFFERS_LIST[currentType];
+    return pointDestination;
   }
 
   // -------- Обработчики -------- //
 
   _btnSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(this._data);
+
+    if (!this._isCityValid(this._cityInputElement.value)) {
+      this._cityInputElement.setCustomValidity(cityErrorMessage);
+      return;
+    }
+
+    this._callback.submit(NewPoint.parseDataToPoint(this._data));
   }
 
   _closeClickHandler() {
@@ -156,33 +187,38 @@ class NewPoint extends SmartView {
 
   _pointTypeChangeHandler(evt) {
     evt.preventDefault();
+    this._offersForPoint = this._getOffers(evt.target.value);
     this.updateData({
       currentType: evt.target.value,
-      currentOffers: this._getOffers(evt.target.value)
+      currentOffers: []
     });
   }
 
   _cityChangeHandler(evt) {
     evt.preventDefault();
+    const chosedCity = evt.target.value;
 
-    if (this._isCityValid(evt)) {
+    if (!this._isCityValid(chosedCity)) {
       this._cityInputElement.setCustomValidity(cityErrorMessage);
       return;
     }
 
+    const pointDestination = this._getPointDestination(chosedCity);
+
     this.updateData({
-      currentCity: evt.target.value,
-      descr: generatePointDescr(),
-      photosList: generatePointPhotos()
+      currentCity: chosedCity,
+      descr: pointDestination.descr,
+      photosList: pointDestination.photos
     });
   }
 
   _offerChangeHandler(evt) {
     evt.preventDefault();
     const inputValue = evt.target.dataset.value;
-    const currentOfferList = this._data.currentOffers;
+    const currentOfferList = this._offersForPoint;
+
     const modifiedOfferList = currentOfferList.map((currentOffer) => {
-      return currentOffer.name === inputValue ?
+      return currentOffer.title === inputValue ?
         Object.assign(
             {},
             currentOffer,
@@ -192,8 +228,19 @@ class NewPoint extends SmartView {
         ) : currentOffer;
     });
 
+    this._offersForPoint = modifiedOfferList;
+
+    const checkedOffers = modifiedOfferList.reduce((result, offer) => {
+
+      if (offer.checked) {
+        result.push(offer);
+      }
+      return result;
+
+    }, []);
+
     this.updateData({
-      currentOffers: modifiedOfferList
+      currentOffers: checkedOffers
     }, true);
   }
 
@@ -202,7 +249,7 @@ class NewPoint extends SmartView {
 
     this.updateData({
       startDate: userDate,
-      duration: getTripPointDuration(userDate, this._data.endDate)
+      duration: getFullDuration(userDate, this._data.endDate)
     }, true);
 
   }
@@ -212,7 +259,7 @@ class NewPoint extends SmartView {
 
     this.updateData({
       endDate: userDate,
-      duration: getTripPointDuration(this._data.startDate, userDate)
+      duration: getFullDuration(this._data.startDate, userDate)
     }, true);
   }
 
@@ -236,7 +283,7 @@ class NewPoint extends SmartView {
   }
 
   _setOffersChangeHandler() {
-    if (this._data.currentOffers.length === 0) {
+    if (this._offersForPoint.length === 0) {
       return;
     }
     const offerList = this.getElement().querySelectorAll(`.event__offer-checkbox`);
@@ -246,6 +293,7 @@ class NewPoint extends SmartView {
   }
 
   _setInnerHandlers() {
+    this._cityInputElement = this.getElement().querySelector(`.event__input--destination`);
     this._cityInputElement.addEventListener(`change`, this._cityChangeHandler);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`input`, this._costInputHandler);
     this._setPointTypeChangeHandler();
@@ -286,17 +334,25 @@ class NewPoint extends SmartView {
 
   // -------- Статичные методы -------- //
 
-  static parseDataToUpdatedDate(data) {
+  static getPlaceholderData() {
+    return {
+      cost: 0,
+      currentCity: `Choose the city`,
+      currentType: `flight`,
+      currentOffers: [],
+      photosList: [],
+      descr: ``,
+      startDate: new Date(),
+      endDate: new Date(),
+      isFavorite: false
+    };
+  }
+  static parseDataToPoint(data) {
     return Object.assign(
         {},
         data,
         {
-          cost: 0,
-          currentCity: `London`,
-          currentType: `Flight`,
-          currentOffers: OFFERS_LIST[`Flight`],
-          startDate: new Date(),
-          endDate: new Date()
+          duration: getFullDuration(data.startDate, data.endDate)
         }
     );
   }

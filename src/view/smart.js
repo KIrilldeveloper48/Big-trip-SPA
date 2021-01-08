@@ -12,6 +12,7 @@ class Smart extends AbstractView {
       return;
     }
 
+
     this._data = Object.assign(
         {},
         this._data,
