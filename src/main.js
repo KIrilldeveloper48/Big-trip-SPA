@@ -78,55 +78,28 @@ const handleSiteMenuClick = (menuItem) => {
 tripPresenter.init();
 filterPresenter.init();
 
-// Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then((data) => {
-//   pointsModel.setOffers(data[0]);
-//   pointsModel.setDestinations(data[1]);
-//   pointsModel.setPoints(UpdateType.INIT, data[2]);
-
-//   render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
-//   render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
-//   render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
-
-//   menuComponent.setMenuClickHandler(handleSiteMenuClick);
-//   NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
-// })
-//   .catch(() => {
-//     pointsModel.setPoints(UpdateType.INIT, []);
-
-//     render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
-//     render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
-//     render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
-
-//     menuComponent.setMenuClickHandler(handleSiteMenuClick);
-//     NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
-//   });
-
-
-api.getPoints().then((point) => {
-  pointsModel.setPoints(UpdateType.INIT, point);
+Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then((data) => {
+  pointsModel.setOffers(data[0]);
+  pointsModel.setDestinations(data[1]);
+  pointsModel.setPoints(UpdateType.INIT, data[2]);
 
   render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
   render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
+  render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
 
   menuComponent.setMenuClickHandler(handleSiteMenuClick);
-})
- .catch(() => {
-   pointsModel.setPoints(UpdateType.INIT, []);
-
-   render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
-   render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
-
-   menuComponent.setMenuClickHandler(handleSiteMenuClick);
- });
-
-Promise.all([api.getOffers(), api.getDestinations()]).then((data) => {
-  pointsModel.setOffers(data[0]);
-  pointsModel.setDestinations(data[1]);
-
-  render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
   NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
 })
   .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
     pointsModel.setOffers([]);
     pointsModel.setDestinations([]);
+
+    render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
+    render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
+    render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
+
+    menuComponent.setMenuClickHandler(handleSiteMenuClick);
+    NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
   });
+
