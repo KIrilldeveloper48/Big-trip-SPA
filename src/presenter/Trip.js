@@ -1,25 +1,22 @@
-// Дочерний презентер
 import PointPresenter from "./point";
-// Вьюхи
+import PointNewPresenter from "./point-new";
+
 import InfoView from "../view/header-info";
 import CostView from "../view/header-cost";
 import SortView from "../view/main-sort";
 import EventsListContainer from "../view/main-list-events";
 import HiddenHeader from '../view/hidden-header';
 import Placeholder from "../view/placeholder";
-// Моковые данные
-import {SORT_LIST, SortType} from '../mocks/const';
-// Всп. функции
+import LoadingView from "../view/loading";
+
 import {render, RenderPosition, remove, replace} from '../utils/render';
 import {sortTime, sortPrice, sortDate} from "../utils/sorting";
 import {filter} from "../utils/filter.js";
-// Константы
-import {HiddenHeaderList, UpdateType, UserAction} from '../const';
-import PointNewPresenter from "./point-new";
-import {generateTripPoints} from "../mocks/trip-point";
+
+import {HiddenHeaderList, UpdateType, UserAction, SORT_LIST, SortType} from '../const';
 
 class Trip {
-  constructor(tripContainer, pointsModel, filterModel) {
+  constructor(tripContainer, pointsModel, filterModel, api) {
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     // Основной конетнер для отрисовки
@@ -30,11 +27,15 @@ class Trip {
     this._pointPresenter = {};
     // Изначальный тип сортировки (По дате)
     this._currentSortType = SortType.DEFAULT;
+
+    this._isLoading = true;
+    this._api = api;
     // Компоненты для отрисовки
     this._headerInfoComponent = null;
     this._headerCostComponent = null;
     this._sortComponent = null;
-    this._noPointComponent = new Placeholder();
+    this._noPointComponent = null;
+    this._loadingComponent = null;
     this._eventsListComponent = new EventsListContainer();
     // Скрытые заголовки
 
@@ -48,7 +49,7 @@ class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
 
-    this._pointNewPresenter = new PointNewPresenter(generateTripPoints(), this._eventsListComponent, this._handleViewAction);
+    this._pointNewPresenter = null;
   }
 
 
@@ -56,8 +57,16 @@ class Trip {
   init() {
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._pointNewPresenter = new PointNewPresenter(this._eventsListComponent, this._handleViewAction, this._pointsModel);
+
     // Отрисовываем скрытый заголовок для контентной части
     this._renderH2ForTripEvents();
+
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
 
     // Запускаем проверку: если нет точек которые можно отрисовать - рисуем заглушку,
     // Иначе отрисовываем информацию о маршруте и стоимости, сортировку и сами точки
@@ -107,7 +116,16 @@ class Trip {
 
   _clearListAndSort() {
     this._clearPointsList();
-    remove(this._sortComponent);
+
+    if (this._sortComponent !== null) {
+      remove(this._sortComponent);
+    }
+    if (this._noPointComponent !== null) {
+      remove(this._noPointComponent);
+    }
+    if (this._loadingComponent !== null) {
+      remove(this._loadingComponent);
+    }
   }
 
 
@@ -148,15 +166,10 @@ class Trip {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  // Отрисовка заглушки, если нет точек
-  _renderNoPoint() {
-    render(this._pointsContainer, this._noPointComponent, RenderPosition.BEFOREEND);
-  }
-
   // Логика про отрисовке одной точки. Создаём новый экземпляр класса, в параметрнах передаём контейнер для отрисовки и функцию-коллбэк для обновления точки.
   // После каждого вызыва метода записываем новый экземпляр класса в список
   _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange);
+    const pointPresenter = new PointPresenter(this._eventsListComponent, this._handleViewAction, this._handleModeChange, this._pointsModel);
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
@@ -174,6 +187,19 @@ class Trip {
   _renderH2ForTripEvents() {
     render(this._pointsContainer, this._eventsListHeaderComponent, RenderPosition.AFTERBEGIN);
   }
+
+  // Отрисовка заглушки пока загружаеются точки
+  _renderLoading() {
+    this._loadingComponent = new LoadingView();
+    render(this._pointsContainer, this._loadingComponent, RenderPosition.BEFOREEND);
+  }
+
+  // Отрисовка заглушки, если нет точек
+  _renderNoPoint() {
+    this._noPointComponent = new Placeholder();
+    render(this._pointsContainer, this._noPointComponent, RenderPosition.BEFOREEND);
+  }
+
 
   _renderListAndHeader() {
     if (this._pointsModel.getPoints().length === 0) {
@@ -204,15 +230,21 @@ class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update).then((response) => {
+          this._pointsModel.updatePoint(updateType, response);
+        });
         break;
 
       case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
+        this._api.addPoint(update).then((response) => {
+          this._pointsModel.addPoint(updateType, response);
+        });
         break;
 
       case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
+        this._api.deletePoint(update).then(() => {
+          this._pointsModel.deletePoint(updateType, update);
+        });
     }
   }
 
@@ -229,6 +261,12 @@ class Trip {
       case UpdateType.MAJOR:
         this._clearPointsList();
         this._renderListAndHeader();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this.init();
+        break;
     }
   }
 

@@ -1,5 +1,6 @@
-import {SortListDisable} from '../mocks/const';
 import AbstractView from "./abstract";
+
+import {SortListDisable} from '../const';
 
 // Генерация разметки для типов сортировки точек
 const generateSortListTemplate = (sortList, currentSort) => {

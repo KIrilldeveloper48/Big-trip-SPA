@@ -1,12 +1,15 @@
-import {Keys, UpdateType, UserAction} from "../const";
-import {remove, render, RenderPosition} from "../utils/render";
 import NewPointView from "../view/main-new-point";
-import {generateId} from './../mocks/trip-point';
+
+import {remove, render, RenderPosition} from "../utils/render";
+import {Keys, UpdateType, UserAction} from "../const";
+
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 
 class PointNew {
-  constructor(data, pointListContainer, changeData) {
-    this._data = data;
+  constructor(pointListContainer, changeData, pointsModel) {
+    this._pointsModel = pointsModel;
+    this._offerList = this._pointsModel.getOffers();
+    this._destinations = this._pointsModel.getDestinations();
     this._pointListContainer = pointListContainer;
     this._changeData = changeData;
 
@@ -23,8 +26,7 @@ class PointNew {
     if (this._newPointComponent !== null) {
       return;
     }
-
-    this._newPointComponent = new NewPointView(this._data);
+    this._newPointComponent = new NewPointView(this._offerList, this._destinations);
     this._newPointComponent.setSubmitHandler(this._handleFormSubmit);
     this._newPointComponent.setCloseClickHandler(this._handleCancelClick);
 
@@ -51,7 +53,7 @@ class PointNew {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MAJOR,
-        Object.assign(point, {id: generateId()})
+        point
     );
     this.destroy();
   }
