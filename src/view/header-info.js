@@ -1,11 +1,11 @@
 import {getFormatedDate} from '../utils/common';
-import {DateFormats, maxCityVisible} from '../const';
+import {DateFormats, MAX_CITY_VISIBLE} from '../const';
 import AbstractView from './abstract';
 
 // Получаем маршрут путешествия
 const getTitleInfo = (pointsList) => {
 
-  if (pointsList.length > maxCityVisible) {
+  if (pointsList.length > MAX_CITY_VISIBLE) {
     return `${pointsList[0].currentCity} &mdash; ... &mdash; ${pointsList[pointsList.length - 1].currentCity}`;
   }
 

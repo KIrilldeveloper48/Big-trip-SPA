@@ -4,8 +4,8 @@ import he from "he";
 import SmartView from "./smart";
 
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
-import {getFormatedDate, ucFirst, getOffersForPoint, getFullDuration} from "../utils/common";
-import {DateFormats, cityErrorMessage, typesList} from "../const";
+import {getFormatedDate, ucFirst, getOffersForPoint, getFullDuration, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
+import {DateFormats, CITY_ERROR_MESSAGE, TYPE_LIST} from "../const";
 
 
 const {FULL_TIME: formateFullTime} = DateFormats;
@@ -27,7 +27,7 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
               <div class="event__type-list">
                 <fieldset class="event__type-group">
                   <legend class="visually-hidden">Event type</legend>
-                 ${generateTypesListTemplate(typesList, currentType)}
+                 ${generateTypesListTemplate(TYPE_LIST, currentType)}
                 </fieldset>
               </div>
             </div>
@@ -77,7 +77,7 @@ class NewPoint extends SmartView {
 
     this._destinations = destinations;
     this._offerList = offerList;
-    this._citiesList = this._getCitiesList();
+    this._citiesList = getCitiesList(this._destinations);
 
     this._offersForPoint = getOffersForPoint(this._data.currentOffers, this._offerList, this._data.currentType);
 
@@ -126,48 +126,14 @@ class NewPoint extends SmartView {
     this._endDatepicker = null;
   }
 
-  // -------- Вспомогательные методы -------- //
-
-  _isCityValid(city) {
-    return this._citiesList.indexOf(city) >= 0;
-  }
-
-  _getOffers(currentType) {
-    return this._offerList[currentType].length === 0
-      ? []
-      : this._offerList[currentType];
-  }
-
-  _getCitiesList() {
-    return this._destinations.length === 0
-      ? []
-      : this._destinations.map((destination) => destination.name);
-  }
-
-  _getPointDestination(city) {
-
-    const pointDestination = {
-      descr: ``,
-      photos: []
-    };
-
-    for (let item of this._destinations) {
-      if (item.name === city) {
-        pointDestination.descr = item.description;
-        pointDestination.photos = item.pictures;
-        return pointDestination;
-      }
-    }
-    return pointDestination;
-  }
 
   // -------- Обработчики -------- //
 
   _btnSubmitHandler(evt) {
     evt.preventDefault();
 
-    if (!this._isCityValid(this._cityInputElement.value)) {
-      this._cityInputElement.setCustomValidity(cityErrorMessage);
+    if (!isCityValid(this._cityInputElement.value, this._citiesList)) {
+      this._cityInputElement.setCustomValidity(CITY_ERROR_MESSAGE);
       return;
     }
 
@@ -187,7 +153,7 @@ class NewPoint extends SmartView {
 
   _pointTypeChangeHandler(evt) {
     evt.preventDefault();
-    this._offersForPoint = this._getOffers(evt.target.value);
+    this._offersForPoint = getOffers(evt.target.value, this._offerList);
     this.updateData({
       currentType: evt.target.value,
       currentOffers: []
@@ -198,17 +164,17 @@ class NewPoint extends SmartView {
     evt.preventDefault();
     const chosedCity = evt.target.value;
 
-    if (!this._isCityValid(chosedCity)) {
-      this._cityInputElement.setCustomValidity(cityErrorMessage);
+    if (!isCityValid(chosedCity, this._citiesList)) {
+      this._cityInputElement.setCustomValidity(CITY_ERROR_MESSAGE);
       return;
     }
 
-    const pointDestination = this._getPointDestination(chosedCity);
+    const {descr, photos: photosList} = getPointDestination(chosedCity, this._destinations);
 
     this.updateData({
       currentCity: chosedCity,
-      descr: pointDestination.descr,
-      photosList: pointDestination.photos
+      descr,
+      photosList
     });
   }
 

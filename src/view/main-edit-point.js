@@ -5,8 +5,8 @@ import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import SmartView from "./smart";
 
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
-import {getFormatedDate, ucFirst, getFullDuration, getOffersForPoint} from "../utils/common";
-import {DateFormats, cityErrorMessage, typesList} from "../const";
+import {getFormatedDate, ucFirst, getFullDuration, getOffersForPoint, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
+import {DateFormats, CITY_ERROR_MESSAGE, TYPE_LIST} from "../const";
 
 
 const {FULL_TIME: formateFullTime} = DateFormats;
@@ -27,7 +27,7 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${generateTypesListTemplate(typesList, currentType)}
+                    ${generateTypesListTemplate(TYPE_LIST, currentType)}
                   </fieldset>
                 </div>
               </div>
@@ -80,10 +80,9 @@ class EditPoint extends SmartView {
 
     this._destinations = destinations;
     this._offerList = offerList;
-    this._citiesList = this._getCitiesList();
+    this._citiesList = getCitiesList(this._destinations);
 
     this._offersForPoint = getOffersForPoint(this._data.currentOffers, this._offerList, this._data.currentType);
-    this._offersForPointBck = this._offersForPoint.slice();
 
     this._cityInputElement = this.getElement().querySelector(`.event__input--destination`);
 
@@ -118,7 +117,7 @@ class EditPoint extends SmartView {
   }
 
   reset(data) {
-    this._offersForPoint = this._offersForPointBck;
+    this._offersForPoint = getOffersForPoint(data.currentOffers, this._offerList, data.currentType);
     this.updateData(
         EditPoint.parseDataToUpdatedData(data)
     );
@@ -139,43 +138,6 @@ class EditPoint extends SmartView {
     this._endDatepicker = null;
   }
 
-  // -------- Вспомогательные методы -------- //
-
-  _isCityValid(city) {
-    return this._citiesList.indexOf(city) >= 0;
-  }
-
-  _getOffers(currentType) {
-
-    return this._offerList.length === 0 || this._offerLis[currentType].length === 0
-      ? []
-      : this._offerList[currentType];
-  }
-
-  _getCitiesList() {
-    return this._destinations.length === 0
-      ? []
-      : this._destinations.map((destination) => destination.name);
-  }
-
-  _getPointDestination(city) {
-
-    const pointDestination = {
-      descr: ``,
-      photos: []
-    };
-
-
-    for (let item of this._destinations) {
-      if (item.name === city) {
-        pointDestination.descr = item.description;
-        pointDestination.photos = item.pictures;
-        return pointDestination;
-      }
-    }
-    return pointDestination;
-  }
-
 
   // -------- Обработчики -------- //
 
@@ -190,7 +152,7 @@ class EditPoint extends SmartView {
 
   _pointTypeChangeHandler(evt) {
     evt.preventDefault();
-    this._offersForPoint = this._getOffers(evt.target.value);
+    this._offersForPoint = getOffers(evt.target.value, this._offerList);
     this.updateData({
       currentType: evt.target.value,
       currentOffers: []
@@ -201,17 +163,17 @@ class EditPoint extends SmartView {
     evt.preventDefault();
     const chosedCity = evt.target.value;
 
-    if (!this._isCityValid(chosedCity)) {
-      this._cityInputElement.setCustomValidity(cityErrorMessage);
+    if (!isCityValid(chosedCity, this._citiesList)) {
+      this._cityInputElement.setCustomValidity(CITY_ERROR_MESSAGE);
       return;
     }
 
-    const pointDestination = this._getPointDestination(chosedCity);
+    const {descr, photos: photosList} = getPointDestination(chosedCity, this._destinations);
 
     this.updateData({
       currentCity: chosedCity,
-      descr: pointDestination.descr,
-      photosList: pointDestination.photos
+      descr,
+      photosList
     });
   }
 

@@ -78,10 +78,10 @@ const handleSiteMenuClick = (menuItem) => {
 tripPresenter.init();
 filterPresenter.init();
 
-Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then((data) => {
-  pointsModel.setOffers(data[0]);
-  pointsModel.setDestinations(data[1]);
-  pointsModel.setPoints(UpdateType.INIT, data[2]);
+Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
+  pointsModel.setOffers(offers);
+  pointsModel.setDestinations(destinations);
+  pointsModel.setPoints(UpdateType.INIT, points);
 
   render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
   render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);

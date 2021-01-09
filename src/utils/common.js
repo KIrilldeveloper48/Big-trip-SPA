@@ -38,6 +38,36 @@ export const getOffersForPoint = (currentOffers, offerList, type) => {
   });
 };
 
+export const isCityValid = (city, citiesList) => {
+  return citiesList.indexOf(city) >= 0;
+};
+
+export const getOffers = (currentType, offerList) => {
+  return offerList.length === 0 || offerList[currentType].length === 0
+    ? []
+    : offerList[currentType];
+};
+
+export const getCitiesList = (destinations) => {
+  return destinations.length === 0
+    ? []
+    : destinations.map((destination) => destination.name);
+};
+
+export const getPointDestination = (city, destinations) => {
+  let descr = ``;
+  let photos = [];
+
+  for (let item of destinations) {
+    if (item.name === city) {
+      descr = item.description;
+      photos = item.pictures;
+      return {descr, photos};
+    }
+  }
+  return {descr, photos};
+};
+
 // Дата и длительность
 export const getFormatedDate = (date, format) => {
   return dayjs(date).format(format);

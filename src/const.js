@@ -1,6 +1,6 @@
-export const maxCityVisible = 3;
+export const MAX_CITY_VISIBLE = 3;
 
-export const typesList = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+export const TYPE_LIST = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
 
 export const HiddenHeaderList = {
   FILTERS: `Filter events`,
@@ -12,6 +12,8 @@ export const Keys = {
   ESC: `Esc`,
   ESCAPE: `Escape`
 };
+
+export const CITY_ERROR_MESSAGE = `The city you specified is not available. Please select a city from the list.`;
 
 
 // Сортировка
@@ -71,7 +73,6 @@ export const ChartSymbols = {
   TIME_SPEND: `D`
 };
 
-export const cityErrorMessage = `The city you specified is not available. Please select a city from the list.`;
 
 export const BAR_HEIGHT = 55;
 
