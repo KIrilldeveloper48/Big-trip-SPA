@@ -73,7 +73,6 @@ class PointNew {
         UpdateType.MAJOR,
         point
     );
-    this.destroy();
   }
 
   _handleCancelClick() {

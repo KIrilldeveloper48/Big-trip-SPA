@@ -247,6 +247,7 @@ class Trip {
         this._api.addPoint(update)
           .then((response) => {
             this._pointsModel.addPoint(updateType, response);
+            this._pointNewPresenter.destroy();
           })
           .catch(() => {
             this._pointNewPresenter.setAborting();
