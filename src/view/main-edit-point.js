@@ -12,8 +12,9 @@ import {DateFormats, CITY_ERROR_MESSAGE, TYPE_LIST} from "../const";
 const {FULL_TIME: formateFullTime} = DateFormats;
 
 const createEditPointTemplate = (data, citiesList, offerList) => {
-  const {currentType, cost, currentCity, descr, photosList, startDate, endDate} = data;
+  const {currentType, cost, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving, isDeleting} = data;
   const costToString = String(cost);
+  const disable = isDisabled ? `disabled` : ``;
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -22,7 +23,7 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
                   <span class="visually-hidden">Choose event type</span>
                   <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType}.png" alt="Event type icon">
                 </label>
-                <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${disable}>
 
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
@@ -36,7 +37,7 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${ucFirst(currentType)}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1" ${disable}>
                 <datalist id="destination-list-1">
                   ${generateCitiesListTemplate(citiesList)}
                 </datalist>
@@ -44,10 +45,10 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}">
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}">
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -55,12 +56,12 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}">
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
               </div>
 
-              <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-              <button class="event__reset-btn" type="reset">Delete</button>
-              <button class="event__rollup-btn" type="button">
+              <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${isSaving ? `Saving...` : `Save`}</button>
+              <button class="event__reset-btn" type="reset" ${disable}> ${isDeleting ? `Deleting...` : `Delete`}</button>
+              <button class="event__rollup-btn" type="button" ${disable}>
                 <span class="visually-hidden">Open event</span>
               </button>
             </header>
@@ -76,7 +77,7 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
 class EditPoint extends SmartView {
   constructor(data, offerList, destinations) {
     super(data);
-    this._data = EditPoint.parseDataToUpdatedData(data);
+    this._data = EditPoint.parseFormToData(data);
 
     this._destinations = destinations;
     this._offerList = offerList;
@@ -119,7 +120,7 @@ class EditPoint extends SmartView {
   reset(data) {
     this._offersForPoint = getOffersForPoint(data.currentOffers, this._offerList, data.currentType);
     this.updateData(
-        EditPoint.parseDataToUpdatedData(data)
+        EditPoint.parseFormToData(data)
     );
   }
 
@@ -143,7 +144,7 @@ class EditPoint extends SmartView {
 
   _btnSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(this._data);
+    this._callback.submit(EditPoint.parseDataToForm(this._data));
   }
 
   _closeClickHandler() {
@@ -236,7 +237,7 @@ class EditPoint extends SmartView {
 
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(EditPoint.parseDataToUpdatedData(this._data));
+    this._callback.deleteClick(EditPoint.parseDataToForm(this._data));
   }
 
   // -------- Установка обработчиков -------- //
@@ -315,12 +316,29 @@ class EditPoint extends SmartView {
 
   // -------- Статичные методы -------- //
 
-  static parseDataToUpdatedData(data) {
+  static parseFormToData(data) {
     return Object.assign(
         {},
-        data
+        data,
+        {
+          isDeleting: false,
+          isSaving: false,
+          isDisabled: false
+        }
+
     );
   }
+
+  static parseDataToForm(data) {
+    data = Object.assign({}, data);
+
+    delete data.isDeleting;
+    delete data.isSaving;
+    delete data.isDisabled;
+
+    return data;
+  }
+
 }
 
 export default EditPoint;
