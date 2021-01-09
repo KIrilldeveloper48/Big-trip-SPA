@@ -1,8 +1,10 @@
-import {FilterType, UpdateType} from "../const";
-import {filter} from "../utils/filter";
-import {remove, render, RenderPosition, replace} from "../utils/render";
 import FilterView from "../view/header-filters";
 import HiddenHeader from "../view/hidden-header";
+
+import {filter} from "../utils/filter";
+import {remove, render, RenderPosition, replace} from "../utils/render";
+
+import {FilterType, UpdateType} from "../const";
 
 class Filter {
   constructor(filterContainer, filterModel, pointsModel) {

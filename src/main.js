@@ -1,4 +1,3 @@
-import {generateTripPoints} from './mocks/trip-point';
 import Trip from "./presenter/trip";
 import PointsModel from "./model/points";
 import FilterModel from './model/filter';
@@ -9,44 +8,29 @@ import {remove, render, RenderPosition} from './utils/render';
 import HiddenHeader from './view/hidden-header';
 import NewPointBtnView from './view/new-point-btn';
 import StatisticsView from './view/statistics';
+import Api from './api';
 
 
-const POINTS_COUNT = 20;
-
-// Получаем массив с точками маршрута
-const getPointList = () => {
-  let pointList = [];
-  for (let i = 0; i < POINTS_COUNT; i++) {
-    pointList.push(generateTripPoints());
-  }
-
-  return pointList;
-};
-
-const pointsList = getPointList();
-
-const pointsModel = new PointsModel();
-pointsModel.setPoints(pointsList);
-
-const filterModel = new FilterModel();
+const AUTORIZATION = `Basic i7ddr4g1080asus`;
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const siteMainElement = document.querySelector(`.page-body`);
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
 const mainHeaderElement = siteMainElement.querySelector(`.trip-main`);
 const pointListElement = siteMainElement.querySelector(`.trip-events`);
 
+const api = new Api(END_POINT, AUTORIZATION);
+
+const pointsModel = new PointsModel();
+const filterModel = new FilterModel();
 
 const menuComponent = new MenuView(MenuItem);
 const menuHeaderComponent = new HiddenHeader(HiddenHeaderList.MENU);
-render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
-render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
-
 const NewPointBtnComponent = new NewPointBtnView(MenuItem);
-render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
-
 
 const filterPresenter = new Filter(tripControlsElement, filterModel, pointsModel);
-const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel);
+const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel, api);
+
 
 const handlePointNewFormClose = () => {
   menuComponent.setMenuItem(MenuItem.TABLE);
@@ -91,9 +75,31 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-menuComponent.setMenuClickHandler(handleSiteMenuClick);
-NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
-
 tripPresenter.init();
 filterPresenter.init();
+
+Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
+  pointsModel.setOffers(offers);
+  pointsModel.setDestinations(destinations);
+  pointsModel.setPoints(UpdateType.INIT, points);
+
+  render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
+  render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
+  render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
+
+  menuComponent.setMenuClickHandler(handleSiteMenuClick);
+  NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
+})
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+    pointsModel.setOffers([]);
+    pointsModel.setDestinations([]);
+
+    render(tripControlsElement, menuComponent, RenderPosition.AFTERBEGIN);
+    render(tripControlsElement, menuHeaderComponent, RenderPosition.AFTERBEGIN);
+    render(mainHeaderElement, NewPointBtnComponent, RenderPosition.BEFOREEND);
+
+    menuComponent.setMenuClickHandler(handleSiteMenuClick);
+    NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
+  });
 

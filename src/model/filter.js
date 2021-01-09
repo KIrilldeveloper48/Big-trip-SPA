@@ -1,5 +1,6 @@
-import {FilterType} from "../const";
 import Observer from "../utils/observer";
+import {FilterType} from "../const";
+
 
 class Filter extends Observer {
   constructor() {

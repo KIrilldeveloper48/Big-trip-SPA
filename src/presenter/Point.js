@@ -11,7 +11,10 @@ const Mode = {
 };
 
 class Point {
-  constructor(pointContainer, changeData, changeMode) {
+  constructor(pointContainer, changeData, changeMode, pointsModel) {
+    this._pointsModel = pointsModel;
+    this._offerList = pointsModel.getOffers();
+    this._destinations = pointsModel.getDestinations();
     // Контейнер для отрисовки точек
     this._pointContainerElement = pointContainer.getElement();
     // Метод для отображения изменённых данных
@@ -35,14 +38,13 @@ class Point {
 
   init(point) {
     this._point = point;
-
     // Запоминаем отрисованные компоненты (При первом вызове = null)
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
     // Создаём новые экземпляры точки и формы редактировния
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point);
+    this._pointEditComponent = new PointEditView(point, this._offerList, this._destinations);
 
     // Вешаем обработчики
     this._pointComponent.setOpenClickHandler(this._openClickHandler);

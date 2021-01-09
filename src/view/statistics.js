@@ -1,8 +1,11 @@
-import SmartView from "./smart";
 import Chart from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import {BAR_HEIGHT, CHART_DATA_TYPE, ChartSymbols} from './../const';
+
+import SmartView from "./smart";
+
 import {getTypesUniq, getChartsData} from "../utils/statistics";
+import {BAR_HEIGHT, CHART_DATA_TYPE, ChartSymbols} from './../const';
+
 
 const {MONEY: moneySymbol, TYPE: typeSymbol, TIME_SPEND: timeSpendSymbol} = ChartSymbols;
 

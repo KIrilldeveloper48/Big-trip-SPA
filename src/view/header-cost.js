@@ -7,9 +7,9 @@ const getPointCost = (offersList, cost) => {
   }
 
   const pointCost = offersList.reduce((result, offer) => {
-    if (offer.checked) {
-      result += offer.cost;
-    }
+
+    result += offer.price;
+
     return result;
   }, cost);
 
