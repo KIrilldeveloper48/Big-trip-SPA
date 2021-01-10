@@ -49,13 +49,30 @@ class PointNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._newPointComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._newPointComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+      });
+    };
+
+    this._newPointComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(point) {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MAJOR,
         point
     );
-    this.destroy();
   }
 
   _handleCancelClick() {

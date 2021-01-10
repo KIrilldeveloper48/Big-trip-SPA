@@ -10,6 +10,12 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 class Point {
   constructor(pointContainer, changeData, changeMode, pointsModel) {
     this._pointsModel = pointsModel;
@@ -64,6 +70,7 @@ class Point {
       replace(this._pointComponent, prevPointComponent);
     } else if (this._mode === Mode.EDITING) {
       replace(this._pointEditComponent, prevPointEditComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -84,6 +91,37 @@ class Point {
   destroy() {
     remove(this._pointComponent);
     remove(this._pointEditComponent);
+  }
+
+  setViewState(state) {
+    const resetFromState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isDeleting: false,
+        isSaving: false
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+
+      case State.DELETING:
+        this._pointEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+
+      case State.ABORTING:
+        this._pointEditComponent.shake(resetFromState);
+        this._pointComponent.shake(resetFromState);
+        break;
+    }
   }
 
   // Логика по замене точки на форму
@@ -131,7 +169,6 @@ class Point {
         UpdateType.MAJOR,
         point
     );
-    this._replaceFormToPoint();
   }
 
   // Для удаления точки

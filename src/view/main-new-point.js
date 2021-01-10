@@ -11,8 +11,9 @@ import {DateFormats, CITY_ERROR_MESSAGE, TYPE_LIST} from "../const";
 const {FULL_TIME: formateFullTime} = DateFormats;
 
 const createNewPointTemplate = (data, offerList, citiesList) => {
-  const {cost, currentType, currentCity, descr, photosList, startDate, endDate} = data;
+  const {cost, currentType, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving} = data;
   const costToString = String(cost);
+  const disable = isDisabled ? `disabled` : ``;
 
   return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
@@ -22,7 +23,7 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
                 <span class="visually-hidden">Choose event type</span>
                   <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType}.png" alt="Event type icon">
               </label>
-              <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+              <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${disable}>
 
               <div class="event__type-list">
                 <fieldset class="event__type-group">
@@ -36,7 +37,7 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
               <label class="event__label  event__type-output" for="event-destination-1">
                 ${ucFirst(currentType)}
               </label>
-              <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1">
+              <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1" ${disable}>
               <datalist id="destination-list-1">
                ${generateCitiesListTemplate(citiesList)}
               </datalist>
@@ -44,10 +45,10 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
 
             <div class="event__field-group  event__field-group--time">
               <label class="visually-hidden" for="event-start-time-1">From</label>
-              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}">
+              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
               &mdash;
               <label class="visually-hidden" for="event-end-time-1">To</label>
-              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}">
+              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
             </div>
 
             <div class="event__field-group  event__field-group--price">
@@ -55,11 +56,11 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
                 <span class="visually-hidden">Price</span>
                 &euro;
               </label>
-              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}">
+              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
             </div>
 
-            <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-            <button class="event__reset-btn" type="reset">Cancel</button>
+            <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${isSaving ? `Saving...` : `Save`}</button>
+            <button class="event__reset-btn" type="reset" ${disable}>Cancel</button>
           </header>
           <section class="event__details">
             ${generateOffersListTemplate(offerList)}
@@ -137,7 +138,7 @@ class NewPoint extends SmartView {
       return;
     }
 
-    this._callback.submit(NewPoint.parseDataToPoint(this._data));
+    this._callback.submit(NewPoint.parseDataToForm(this._data));
   }
 
   _closeClickHandler() {
@@ -310,17 +311,25 @@ class NewPoint extends SmartView {
       descr: ``,
       startDate: new Date(),
       endDate: new Date(),
-      isFavorite: false
+      isFavorite: false,
+      isDeleting: false,
+      isSaving: false,
+      isDisabled: false
     };
   }
-  static parseDataToPoint(data) {
-    return Object.assign(
+  static parseDataToForm(data) {
+    data = Object.assign(
         {},
         data,
         {
           duration: getFullDuration(data.startDate, data.endDate)
         }
     );
+    delete data.isDeleting;
+    delete data.isSaving;
+    delete data.isDisabled;
+
+    return data;
   }
 }
 

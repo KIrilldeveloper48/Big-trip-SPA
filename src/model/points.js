@@ -90,7 +90,7 @@ class Points extends Observer {
           currentOffers: getCurrentOffers(point.offers),
           startDate: new Date(point.date_from),
           endDate: new Date(point.date_to),
-          duration: getFullDuration(new Date(point.date_from), new Date(point.date_to))
+          duration: getFullDuration(new Date(point.date_from), new Date(point.date_to)),
         }
     );
     delete adaptedPoint.type;
