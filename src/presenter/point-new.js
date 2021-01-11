@@ -2,6 +2,8 @@ import NewPointView from "../view/main-new-point";
 
 import {remove, render, RenderPosition} from "../utils/render";
 import {Keys, UpdateType, UserAction} from "../const";
+import {isOnline} from "../utils/common";
+import {toast} from "../utils/toast";
 
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 
@@ -68,6 +70,10 @@ class PointNew {
   }
 
   _handleFormSubmit(point) {
+    if (!isOnline) {
+      toast(`You can't save point offline`);
+      return;
+    }
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MAJOR,

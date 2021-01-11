@@ -14,6 +14,7 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
   const {cost, currentType, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving} = data;
   const costToString = String(cost);
   const disable = isDisabled ? `disabled` : ``;
+  const saving = isSaving ? `Saving...` : `Save`;
 
   return `<li class="trip-events__item">
           <form class="event event--edit" action="#" method="post">
@@ -59,7 +60,7 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
               <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
             </div>
 
-            <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${isSaving ? `Saving...` : `Save`}</button>
+            <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${saving}</button>
             <button class="event__reset-btn" type="reset" ${disable}>Cancel</button>
           </header>
           <section class="event__details">

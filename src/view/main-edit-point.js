@@ -15,6 +15,9 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
   const {currentType, cost, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving, isDeleting} = data;
   const costToString = String(cost);
   const disable = isDisabled ? `disabled` : ``;
+  const saving = isSaving ? `Saving...` : `Save`;
+  const deleting = isDeleting ? `Deleting...` : `Delete`;
+
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
             <header class="event__header">
@@ -59,8 +62,8 @@ const createEditPointTemplate = (data, citiesList, offerList) => {
                 <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
               </div>
 
-              <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${isSaving ? `Saving...` : `Save`}</button>
-              <button class="event__reset-btn" type="reset" ${disable}> ${isDeleting ? `Deleting...` : `Delete`}</button>
+              <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${saving}</button>
+              <button class="event__reset-btn" type="reset" ${disable}> ${deleting}</button>
               <button class="event__rollup-btn" type="button" ${disable}>
                 <span class="visually-hidden">Open event</span>
               </button>
