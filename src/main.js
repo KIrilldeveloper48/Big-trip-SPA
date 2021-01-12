@@ -1,18 +1,29 @@
-import Trip from "./presenter/trip";
+import Api from './api/api';
+import Store from './api/store';
+import Provider from './api/provider';
+
 import PointsModel from "./model/points";
 import FilterModel from './model/filter';
+
+import Trip from './presenter/trip';
 import Filter from './presenter/filter';
-import MenuView from './view/header-menu';
-import {FilterType, HiddenHeaderList, MenuItem, UpdateType} from './const';
-import {remove, render, RenderPosition} from './utils/render';
+
+import MenuView from './view/menu';
+import StatisticsView from './view/statistics';
 import HiddenHeader from './view/hidden-header';
 import NewPointBtnView from './view/new-point-btn';
-import StatisticsView from './view/statistics';
-import Api from './api';
+
+import {remove, render, RenderPosition} from './utils/render';
+import {isOnline} from './utils/common';
+import {FilterType, HiddenHeaderList, MenuItem, UpdateType} from './const';
+import {toast} from './utils/toast';
 
 
-const AUTORIZATION = `Basic i7ddr4g1080asus`;
+const AUTORIZATION = `Basic i7ddr4g1080asus21131322`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
+const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_VER = `v1`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const siteMainElement = document.querySelector(`.page-body`);
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
@@ -20,6 +31,8 @@ const mainHeaderElement = siteMainElement.querySelector(`.trip-main`);
 const pointListElement = siteMainElement.querySelector(`.trip-events`);
 
 const api = new Api(END_POINT, AUTORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
@@ -29,7 +42,7 @@ const menuHeaderComponent = new HiddenHeader(HiddenHeaderList.MENU);
 const NewPointBtnComponent = new NewPointBtnView(MenuItem);
 
 const filterPresenter = new Filter(tripControlsElement, filterModel, pointsModel);
-const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel, api);
+const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel, apiWithProvider);
 
 
 const handlePointNewFormClose = () => {
@@ -45,12 +58,14 @@ const handleSiteMenuClick = (menuItem) => {
       remove(statisticsComponent);
 
       tripPresenter.init();
+      filterPresenter.init();
       menuComponent.removeMenuItemActive();
       menuComponent.setMenuItem(MenuItem.TABLE);
       break;
 
     case MenuItem.STATS:
       tripPresenter.destroy();
+      filterPresenter.init(true);
       menuComponent.removeMenuItemActive();
       menuComponent.setMenuItem(MenuItem.STATS);
 
@@ -68,6 +83,12 @@ const handleSiteMenuClick = (menuItem) => {
       filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
       tripPresenter.init();
 
+      if (!isOnline()) {
+        toast(`You can't create new point offline`);
+        menuComponent.setMenuItem(MenuItem.TABLE);
+        break;
+      }
+
       NewPointBtnComponent.getElement().disabled = true;
       menuComponent.removeMenuItemActive();
       menuComponent.setMenuItem(MenuItem.TABLE);
@@ -78,7 +99,7 @@ const handleSiteMenuClick = (menuItem) => {
 tripPresenter.init();
 filterPresenter.init();
 
-Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
+Promise.all([api.getOffers(), api.getDestinations(), apiWithProvider.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
   pointsModel.setOffers(offers);
   pointsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
@@ -103,3 +124,15 @@ Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]).then(([of
     NewPointBtnComponent.setMenuClickHandler(handleSiteMenuClick);
   });
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});

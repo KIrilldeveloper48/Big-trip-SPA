@@ -1,8 +1,12 @@
-import PointEditView from "../view/main-edit-point";
-import PointView from "../view/main-point";
+import PointEditView from "../view/edit-point";
+import PointView from "../view/point";
 
+import {isOnline} from "../utils/common";
+import {toast} from "../utils/toast";
 import {render, RenderPosition, replace, remove} from '../utils/render';
+
 import {Keys, UpdateType, UserAction} from '../const';
+
 
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 const Mode = {
@@ -144,6 +148,11 @@ class Point {
 
   // Для открытия формы
   _openClickHandler() {
+    if (!isOnline()) {
+      toast(`You can't edit point offline`);
+      return;
+
+    }
     this._replacePointToForm();
   }
 
@@ -164,6 +173,10 @@ class Point {
 
   // Для закрытия формы с сохранением измененй
   _btnSubmitHandler(point) {
+    if (!isOnline()) {
+      toast(`You can't save point offline`);
+      return;
+    }
     this._changeData(
         UserAction.UPDATE_POINT,
         UpdateType.MAJOR,
@@ -173,6 +186,10 @@ class Point {
 
   // Для удаления точки
   _deleteClickHandler(point) {
+    if (!isOnline()) {
+      toast(`You can't delete point offline`);
+      return;
+    }
     this._changeData(
         UserAction.DELETE_POINT,
         UpdateType.MAJOR,

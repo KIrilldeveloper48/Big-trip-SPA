@@ -1,4 +1,4 @@
-import FilterView from "../view/header-filters";
+import FilterView from "../view/filters";
 import HiddenHeader from "../view/hidden-header";
 
 import {filter} from "../utils/filter";
@@ -24,13 +24,13 @@ class Filter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
+  init(isDisabled = false) {
     this._currentFilter = this._filterModel.getFilter();
 
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(filters, this._currentFilter);
+    this._filterComponent = new FilterView(filters, this._currentFilter, isDisabled);
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (prevFilterComponent === null) {

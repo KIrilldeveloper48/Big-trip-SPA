@@ -1,6 +1,10 @@
 import dayjs from 'dayjs';
 import {MLSECONDS_PER_MINUTE, MINUTES_PER_DAY, MINUTES_PER_HOUR} from '../const';
 
+export const isOnline = () => {
+  return window.navigator.onLine;
+};
+
 export const ucFirst = (str) => {
   if (!str) {
     return str;
