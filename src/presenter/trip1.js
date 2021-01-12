@@ -1,4 +1,4 @@
-import PointPresenter, {State as PointPresenterViewState} from "./point";
+import PointPresenter, {State as PointPresenterViewState} from "./point1";
 import PointNewPresenter from "./point-new";
 
 import InfoView from "../view/trip-info";

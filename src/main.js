@@ -5,8 +5,8 @@ import Provider from './api/provider';
 import PointsModel from "./model/points";
 import FilterModel from './model/filter';
 
-import Trip from './presenter/trip';
-import Filter from './presenter/filter';
+import Trip from './presenter/trip1';
+import Filter from './presenter/filter1';
 
 import MenuView from './view/menu';
 import StatisticsView from './view/statistics';
