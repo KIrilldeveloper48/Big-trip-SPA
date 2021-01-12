@@ -1,10 +1,12 @@
-import PointEditView from "../view/main-edit-point";
-import PointView from "../view/main-point";
+import PointEditView from "../view/edit-point";
+import PointView from "../view/point";
 
-import {render, RenderPosition, replace, remove} from '../utils/render';
-import {Keys, UpdateType, UserAction} from '../const';
 import {isOnline} from "../utils/common";
 import {toast} from "../utils/toast";
+import {render, RenderPosition, replace, remove} from '../utils/render';
+
+import {Keys, UpdateType, UserAction} from '../const';
+
 
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 const Mode = {

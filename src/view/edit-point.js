@@ -1,81 +1,87 @@
-import flatpickr from "flatpickr";
 import he from "he";
+import flatpickr from "flatpickr";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 import SmartView from "./smart";
 
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
-import {getFormatedDate, ucFirst, getOffersForPoint, getFullDuration, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
-import {DateFormats, CITY_ERROR_MESSAGE, TYPE_LIST} from "../const";
+import {getFormatedDate, ucFirst, getFullDuration, getOffersForPoint, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
+import {DateFormats, ErrorsMessage, TYPE_LIST} from "../const";
 
 
 const {FULL_TIME: formateFullTime} = DateFormats;
+const {CITY: cityErrMessage, COST: costErrMessage} = ErrorsMessage;
 
-const createNewPointTemplate = (data, offerList, citiesList) => {
-  const {cost, currentType, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving} = data;
+const createEditPointTemplate = (data, citiesList, offerList) => {
+  const {currentType, cost, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving, isDeleting} = data;
   const costToString = String(cost);
   const disable = isDisabled ? `disabled` : ``;
   const saving = isSaving ? `Saving...` : `Save`;
+  const deleting = isDeleting ? `Deleting...` : `Delete`;
 
   return `<li class="trip-events__item">
-          <form class="event event--edit" action="#" method="post">
-          <header class="event__header">
-            <div class="event__type-wrapper">
-              <label class="event__type  event__type-btn" for="event-type-toggle-1">
-                <span class="visually-hidden">Choose event type</span>
+            <form class="event event--edit" action="#" method="post">
+            <header class="event__header">
+              <div class="event__type-wrapper">
+                <label class="event__type  event__type-btn" for="event-type-toggle-1">
+                  <span class="visually-hidden">Choose event type</span>
                   <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType}.png" alt="Event type icon">
-              </label>
-              <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${disable}>
+                </label>
+                <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${disable}>
 
-              <div class="event__type-list">
-                <fieldset class="event__type-group">
-                  <legend class="visually-hidden">Event type</legend>
-                 ${generateTypesListTemplate(TYPE_LIST, currentType)}
-                </fieldset>
+                <div class="event__type-list">
+                  <fieldset class="event__type-group">
+                    <legend class="visually-hidden">Event type</legend>
+                    ${generateTypesListTemplate(TYPE_LIST, currentType)}
+                  </fieldset>
+                </div>
               </div>
-            </div>
 
-            <div class="event__field-group  event__field-group--destination">
-              <label class="event__label  event__type-output" for="event-destination-1">
-                ${ucFirst(currentType)}
-              </label>
-              <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1" ${disable}>
-              <datalist id="destination-list-1">
-               ${generateCitiesListTemplate(citiesList)}
-              </datalist>
-            </div>
+              <div class="event__field-group  event__field-group--destination">
+                <label class="event__label  event__type-output" for="event-destination-1">
+                  ${ucFirst(currentType)}
+                </label>
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1" ${disable}>
+                <datalist id="destination-list-1">
+                  ${generateCitiesListTemplate(citiesList)}
+                </datalist>
+              </div>
 
-            <div class="event__field-group  event__field-group--time">
-              <label class="visually-hidden" for="event-start-time-1">From</label>
-              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
-              &mdash;
-              <label class="visually-hidden" for="event-end-time-1">To</label>
-              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
-            </div>
+              <div class="event__field-group  event__field-group--time">
+                <label class="visually-hidden" for="event-start-time-1">From</label>
+                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
+                &mdash;
+                <label class="visually-hidden" for="event-end-time-1">To</label>
+                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
+              </div>
 
-            <div class="event__field-group  event__field-group--price">
-              <label class="event__label" for="event-price-1">
-                <span class="visually-hidden">Price</span>
-                &euro;
-              </label>
-              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
-            </div>
+              <div class="event__field-group  event__field-group--price">
+                <label class="event__label" for="event-price-1">
+                  <span class="visually-hidden">Price</span>
+                  &euro;
+                </label>
+                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
+              </div>
 
-            <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${saving}</button>
-            <button class="event__reset-btn" type="reset" ${disable}>Cancel</button>
-          </header>
-          <section class="event__details">
+              <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${saving}</button>
+              <button class="event__reset-btn" type="reset" ${disable}> ${deleting}</button>
+              <button class="event__rollup-btn" type="button" ${disable}>
+                <span class="visually-hidden">Open event</span>
+              </button>
+            </header>
+            <section class="event__details">
             ${generateOffersListTemplate(offerList)}
-            
+ 
             ${generateDestinationTemplate(photosList, descr)}
-          </section>
-        </form>
-      </li>`;
+            </section>
+          </form>
+        </li>`;
 };
 
-class NewPoint extends SmartView {
-  constructor(offerList, destinations) {
-    super();
-    this._data = NewPoint.getPlaceholderData();
+class EditPoint extends SmartView {
+  constructor(data, offerList, destinations) {
+    super(data);
+    this._data = EditPoint.parseFormToData(data);
 
     this._destinations = destinations;
     this._offerList = offerList;
@@ -89,21 +95,23 @@ class NewPoint extends SmartView {
     this.endDatepicker = null;
 
     this._btnSubmitHandler = this._btnSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._closeClickHandler = this._closeClickHandler.bind(this);
-    this._costInputHandler = this._costInputHandler.bind(this);
-    this._cityChangeHandler = this._cityChangeHandler.bind(this);
-    this._offerChangeHandler = this._offerChangeHandler.bind(this);
     this._pointTypeChangeHandler = this._pointTypeChangeHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._costInputHandler = this._costInputHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
 
+
   // -------- Основные методы -------- //
 
   getTemplate() {
-    return createNewPointTemplate(this._data, this._offersForPoint, this._citiesList);
+    return createEditPointTemplate(this._data, this._citiesList, this._offersForPoint);
   }
 
   restoreHandlers() {
@@ -113,10 +121,17 @@ class NewPoint extends SmartView {
     this.setCloseClickHandler(this._callback.click);
   }
 
+  reset(data) {
+    this._offersForPoint = getOffersForPoint(data.currentOffers, this._offerList, data.currentType);
+    this.updateData(
+        EditPoint.parseFormToData(data)
+    );
+  }
+
   removeElement() {
     super.removeElement();
 
-    if (this._startDatepicker || this._endDatepicker) {
+    if (this._startDatepicker || this._endtDatepicker) {
       this._removeDatepicker();
     }
   }
@@ -133,24 +148,11 @@ class NewPoint extends SmartView {
 
   _btnSubmitHandler(evt) {
     evt.preventDefault();
-
-    if (!isCityValid(this._cityInputElement.value, this._citiesList)) {
-      this._cityInputElement.setCustomValidity(CITY_ERROR_MESSAGE);
-      return;
-    }
-
-    this._callback.submit(NewPoint.parseDataToForm(this._data));
+    this._callback.submit(EditPoint.parseDataToForm(this._data));
   }
 
   _closeClickHandler() {
     this._callback.click();
-  }
-
-  _costInputHandler(evt) {
-    evt.preventDefault();
-    this.updateData({
-      cost: Number(evt.target.value)
-    }, true);
   }
 
   _pointTypeChangeHandler(evt) {
@@ -167,7 +169,7 @@ class NewPoint extends SmartView {
     const chosedCity = evt.target.value;
 
     if (!isCityValid(chosedCity, this._citiesList)) {
-      this._cityInputElement.setCustomValidity(CITY_ERROR_MESSAGE);
+      this._cityInputElement.setCustomValidity(cityErrMessage);
       return;
     }
 
@@ -178,6 +180,22 @@ class NewPoint extends SmartView {
       descr,
       photosList
     });
+  }
+
+  _costInputHandler(evt) {
+    evt.preventDefault();
+    const cost = Number(evt.target.value);
+
+    if (cost < 0) {
+      evt.target.setCustomValidity(costErrMessage);
+      return;
+    }
+
+    evt.target.setCustomValidity(``);
+
+    this.updateData({
+      cost,
+    }, true);
   }
 
   _offerChangeHandler(evt) {
@@ -219,7 +237,6 @@ class NewPoint extends SmartView {
       startDate: userDate,
       duration: getFullDuration(userDate, this._data.endDate)
     }, true);
-
   }
 
   _endDateChangeHandler([userDate]) {
@@ -231,6 +248,11 @@ class NewPoint extends SmartView {
     }, true);
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPoint.parseDataToForm(this._data));
+  }
+
   // -------- Установка обработчиков -------- //
 
   setSubmitHandler(callback) {
@@ -240,14 +262,12 @@ class NewPoint extends SmartView {
 
   setCloseClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._closeClickHandler);
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
-  _setPointTypeChangeHandler() {
-    const typeList = this.getElement().querySelectorAll(`.event__type-input`);
-    typeList.forEach((item) => {
-      item.addEventListener(`change`, this._pointTypeChangeHandler);
-    });
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   _setOffersChangeHandler() {
@@ -260,6 +280,13 @@ class NewPoint extends SmartView {
     });
   }
 
+  _setPointTypeChangeHandler() {
+    const typeList = this.getElement().querySelectorAll(`.event__type-input`);
+    typeList.forEach((item) => {
+      item.addEventListener(`change`, this._pointTypeChangeHandler);
+    });
+  }
+
   _setInnerHandlers() {
     this._cityInputElement = this.getElement().querySelector(`.event__input--destination`);
     this._cityInputElement.addEventListener(`change`, this._cityChangeHandler);
@@ -269,9 +296,8 @@ class NewPoint extends SmartView {
     this._setDatepicker();
   }
 
-
   _setDatepicker() {
-    if (this._startDatepicker || this._endDatepicker) {
+    if (this._startDatepicker || this._endtDatepicker) {
       this._removeDatepicker();
     }
 
@@ -300,38 +326,32 @@ class NewPoint extends SmartView {
     );
   }
 
+
   // -------- Статичные методы -------- //
 
-  static getPlaceholderData() {
-    return {
-      cost: 0,
-      currentCity: `Choose the city`,
-      currentType: `flight`,
-      currentOffers: [],
-      photosList: [],
-      descr: ``,
-      startDate: new Date(),
-      endDate: new Date(),
-      isFavorite: false,
-      isDeleting: false,
-      isSaving: false,
-      isDisabled: false
-    };
-  }
-  static parseDataToForm(data) {
-    data = Object.assign(
+  static parseFormToData(data) {
+    return Object.assign(
         {},
         data,
         {
-          duration: getFullDuration(data.startDate, data.endDate)
+          isDeleting: false,
+          isSaving: false,
+          isDisabled: false
         }
+
     );
+  }
+
+  static parseDataToForm(data) {
+    data = Object.assign({}, data);
+
     delete data.isDeleting;
     delete data.isSaving;
     delete data.isDisabled;
 
     return data;
   }
+
 }
 
-export default NewPoint;
+export default EditPoint;

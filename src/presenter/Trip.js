@@ -1,10 +1,10 @@
 import PointPresenter, {State as PointPresenterViewState} from "./point";
 import PointNewPresenter from "./point-new";
 
-import InfoView from "../view/header-info";
-import CostView from "../view/header-cost";
-import SortView from "../view/main-sort";
-import EventsListContainer from "../view/main-list-events";
+import InfoView from "../view/trip-info";
+import CostView from "../view/trip-cost";
+import SortView from "../view/sort";
+import EventsListContainer from "../view/events-list-container";
 import HiddenHeader from '../view/hidden-header';
 import Placeholder from "../view/placeholder";
 import LoadingView from "../view/loading";

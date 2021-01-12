@@ -8,7 +8,7 @@ import FilterModel from './model/filter';
 import Trip from './presenter/trip';
 import Filter from './presenter/filter';
 
-import MenuView from './view/header-menu';
+import MenuView from './view/menu';
 import StatisticsView from './view/statistics';
 import HiddenHeader from './view/hidden-header';
 import NewPointBtnView from './view/new-point-btn';
@@ -58,12 +58,14 @@ const handleSiteMenuClick = (menuItem) => {
       remove(statisticsComponent);
 
       tripPresenter.init();
+      filterPresenter.init();
       menuComponent.removeMenuItemActive();
       menuComponent.setMenuItem(MenuItem.TABLE);
       break;
 
     case MenuItem.STATS:
       tripPresenter.destroy();
+      filterPresenter.init(true);
       menuComponent.removeMenuItemActive();
       menuComponent.setMenuItem(MenuItem.STATS);
 

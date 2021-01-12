@@ -13,8 +13,10 @@ export const Keys = {
   ESCAPE: `Escape`
 };
 
-export const CITY_ERROR_MESSAGE = `The city you specified is not available. Please select a city from the list.`;
-
+export const ErrorsMessage = {
+  CITY: `The city you specified is not available. Please select a city from the list.`,
+  COST: `Cost cannot be negative`
+};
 
 // Сортировка
 export const SortListDisable = {

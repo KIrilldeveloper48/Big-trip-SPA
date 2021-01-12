@@ -1,9 +1,11 @@
-import NewPointView from "../view/main-new-point";
+import NewPointView from "../view/new-point";
 
-import {remove, render, RenderPosition} from "../utils/render";
-import {Keys, UpdateType, UserAction} from "../const";
 import {isOnline} from "../utils/common";
 import {toast} from "../utils/toast";
+import {remove, render, RenderPosition} from "../utils/render";
+
+import {Keys, UpdateType, UserAction} from "../const";
+
 
 const {ESCAPE: escapeKey, ESC: escKey} = Keys;
 
