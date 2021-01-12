@@ -2,7 +2,6 @@ import AbstractView from "./abstract";
 
 // Генерация разметки для фильтрации точек
 const generateFiltersListTemplate = (filtersList, currentFilter, isDisabled) => {
-  console.log(isDisabled);
   return filtersList.reduce((result, filter) => {
 
     const filterType = filter.type;
