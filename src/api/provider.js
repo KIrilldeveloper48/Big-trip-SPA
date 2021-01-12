@@ -44,7 +44,7 @@ class Provider {
         });
     }
 
-    this._store.setItem(point.id, PointsModel.adaptToServer(Object.assign({}.point)));
+    this._store.setItem(point.id, PointsModel.adaptToServer(Object.assign({}, point)));
 
     return Promise.resolve(point);
   }
