@@ -5,7 +5,6 @@ import AbstractView from "./abstract";
 import {getFormatedDate} from "../utils/common";
 import {DateFormats} from "../const";
 
-// Генерация разметки для выбранных предложений в точке
 const createOffersListTemplate = (offersList) => {
   if (offersList.length === 0) {
     return ``;

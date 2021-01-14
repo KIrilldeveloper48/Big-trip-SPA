@@ -6,7 +6,6 @@ class Smart extends AbstractView {
     this._data = {};
   }
 
-  // Обновление данных
   updateData(update, justDataUpdating) {
     if (!update) {
       return;
@@ -26,7 +25,6 @@ class Smart extends AbstractView {
     this.updateElement();
   }
 
-  // Обновление элемента
   updateElement() {
     let prevElement = this.getElement();
     const parent = prevElement.parentElement;
@@ -39,7 +37,6 @@ class Smart extends AbstractView {
     this.restoreHandlers();
   }
 
-  // Восстановление обработчиков после обновления элемента
   restoreHandlers() {
     throw new Error(`Abstract method not implemented: resetHandlers`);
   }

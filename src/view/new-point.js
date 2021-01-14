@@ -4,14 +4,14 @@ import he from "he";
 import SmartView from "./smart";
 
 import {generateTypesListTemplate, generateCitiesListTemplate, generateOffersListTemplate, generateDestinationTemplate} from "./common-template";
-import {getFormatedDate, ucFirst, getOffersForPoint, getFullDuration, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
-import {DateFormats, ErrorsMessage, TYPE_LIST} from "../const";
+import {getFormatedDate, getOffersForPoint, getFullDuration, isCityValid, getOffers, getCitiesList, getPointDestination} from "../utils/common";
+import {DateFormats, ErrorsMessage, pointTypeResource} from "../const";
 
 const {CITY: cityErrMessage, COST: costErrMessage} = ErrorsMessage;
 const {FULL_TIME: formateFullTime} = DateFormats;
 
 const createNewPointTemplate = (data, offerList, citiesList) => {
-  const {cost, currentType, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving} = data;
+  const {cost, currentType, currentCity, descr, photosList, startDate, endDate, isDisabled, isSaving, id} = data;
   const costToString = String(cost);
   const disable = isDisabled ? `disabled` : ``;
   const saving = isSaving ? `Saving...` : `Save`;
@@ -20,44 +20,44 @@ const createNewPointTemplate = (data, offerList, citiesList) => {
           <form class="event event--edit" action="#" method="post">
           <header class="event__header">
             <div class="event__type-wrapper">
-              <label class="event__type  event__type-btn" for="event-type-toggle-1">
+              <label class="event__type  event__type-btn" for="event-type-toggle-${id}">
                 <span class="visually-hidden">Choose event type</span>
                   <img class="event__type-icon" width="17" height="17" src="img/icons/${currentType}.png" alt="Event type icon">
               </label>
-              <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${disable}>
+              <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${id}" type="checkbox" ${disable}>
 
               <div class="event__type-list">
                 <fieldset class="event__type-group">
                   <legend class="visually-hidden">Event type</legend>
-                 ${generateTypesListTemplate(TYPE_LIST, currentType)}
+                 ${generateTypesListTemplate(currentType)}
                 </fieldset>
               </div>
             </div>
 
             <div class="event__field-group  event__field-group--destination">
-              <label class="event__label  event__type-output" for="event-destination-1">
-                ${ucFirst(currentType)}
+              <label class="event__label  event__type-output" for="event-destination-${id}">
+                ${pointTypeResource[currentType]}
               </label>
-              <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-1" ${disable}>
-              <datalist id="destination-list-1">
+              <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${he.encode(currentCity)}" list="destination-list-${id}" ${disable}>
+              <datalist id="destination-list-${id}">
                ${generateCitiesListTemplate(citiesList)}
               </datalist>
             </div>
 
             <div class="event__field-group  event__field-group--time">
-              <label class="visually-hidden" for="event-start-time-1">From</label>
-              <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
+              <label class="visually-hidden" for="event-start-time-${id}">From</label>
+              <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${getFormatedDate(startDate, formateFullTime)}" ${disable}>
               &mdash;
-              <label class="visually-hidden" for="event-end-time-1">To</label>
-              <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
+              <label class="visually-hidden" for="event-end-time-${id}">To</label>
+              <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${getFormatedDate(endDate, formateFullTime)}" ${disable}>
             </div>
 
             <div class="event__field-group  event__field-group--price">
-              <label class="event__label" for="event-price-1">
+              <label class="event__label" for="event-price-${id}">
                 <span class="visually-hidden">Price</span>
                 &euro;
               </label>
-              <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(costToString)}" ${disable}>
+              <input class="event__input  event__input--price" id="event-price-${id}" type="number" name="event-price" value="${he.encode(costToString)}" ${disable}>
             </div>
 
             <button class="event__save-btn  btn  btn--blue" type="submit" ${disable}>${saving}</button>
@@ -100,7 +100,6 @@ class NewPoint extends SmartView {
     this._setInnerHandlers();
   }
 
-  // -------- Основные методы -------- //
 
   getTemplate() {
     return createNewPointTemplate(this._data, this._offersForPoint, this._citiesList);
@@ -128,8 +127,6 @@ class NewPoint extends SmartView {
     this._endDatepicker = null;
   }
 
-
-  // -------- Обработчики -------- //
 
   _btnSubmitHandler(evt) {
     evt.preventDefault();
@@ -240,7 +237,6 @@ class NewPoint extends SmartView {
     }, true);
   }
 
-  // -------- Установка обработчиков -------- //
 
   setSubmitHandler(callback) {
     this._callback.submit = callback;
@@ -278,14 +274,13 @@ class NewPoint extends SmartView {
     this._setDatepicker();
   }
 
-
   _setDatepicker() {
     if (this._startDatepicker || this._endDatepicker) {
       this._removeDatepicker();
     }
 
     this._startDatepicker = flatpickr(
-        this.getElement().querySelector(`#event-start-time-1`),
+        this.getElement().querySelector(`#event-start-time-${this._data.id}`),
         {
           enableTime: true,
           [`time_24hr`]: true,
@@ -297,7 +292,7 @@ class NewPoint extends SmartView {
     );
 
     this._endDatepicker = flatpickr(
-        this.getElement().querySelector(`#event-end-time-1`),
+        this.getElement().querySelector(`#event-end-time-${this._data.id}`),
         {
           enableTime: true,
           [`time_24hr`]: true,
@@ -309,10 +304,10 @@ class NewPoint extends SmartView {
     );
   }
 
-  // -------- Статичные методы -------- //
 
   static getPlaceholderData() {
     return {
+      id: 0,
       cost: 0,
       currentCity: `Choose the city`,
       currentType: `flight`,

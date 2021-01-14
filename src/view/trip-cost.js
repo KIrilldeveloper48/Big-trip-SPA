@@ -1,6 +1,5 @@
 import AbstractView from "./abstract.js";
 
-// Получаем итоговую цену для точки исходя из выбранных предложений
 const getPointCost = (offersList, cost) => {
   if (offersList.length === 0) {
     return cost;
@@ -16,7 +15,6 @@ const getPointCost = (offersList, cost) => {
   return pointCost;
 };
 
-// Получаем итоговую цену путешествия
 const getTripCost = (pointList) => {
   return pointList.reduce((result, point) => {
     result += getPointCost(point.currentOffers, point.cost);

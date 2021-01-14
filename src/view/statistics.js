@@ -4,56 +4,60 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import SmartView from "./smart";
 
 import {getTypesUniq, getChartsData} from "../utils/statistics";
-import {BAR_HEIGHT, CHART_DATA_TYPE, ChartSymbols} from './../const';
+import {CHART_DATA_TYPE, ChartSymbols, ChartBarProperties, ChartLabelProperties, ChartTitleProperties, ChartStatTypeProperties} from './../const';
 
 
 const {MONEY: moneySymbol, TYPE: typeSymbol, TIME_SPEND: timeSpendSymbol} = ChartSymbols;
+const {BAR_TYPE: barType, BAR_BG: barBg, BAR_HOVER_BG: barHoverBg, BAR_ANCHOR: barAnchor, BAR_THICKNESS: barThickness, BAR_HEIGHT: barHeight, BAR_LENGTH_MIN: minBarLength} = ChartBarProperties;
+const {LABEL_SIZE: labelSize, LABEL_COLOR: labelColor, LABEL_ANCHOR: labelAnchor, LABEL_ALIGN: labelAlign} = ChartLabelProperties;
+const {TITLE_COLOR: titleColor, TITLE_SIZE: titleSize, TITLE_POSITION: titlePosition} = ChartTitleProperties;
+const {TYPE_COLOR: typeColor, TYPE_SIZE: typeSize, TYPE_PADDING: typePadding} = ChartStatTypeProperties;
 
 const renderChart = (ctx, chartType, typeList, data, prefix, suffix = ``) => {
-  ctx.height = BAR_HEIGHT * (typeList.length - 1);
+  ctx.height = barHeight * (typeList.length - 1);
   return new Chart(ctx, {
     plugins: [ChartDataLabels],
-    type: `horizontalBar`,
+    type: barType,
     data: {
       labels: typeList,
       datasets: [{
         data,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        backgroundColor: barBg,
+        hoverBackgroundColor: barHoverBg,
+        anchor: barAnchor
       }]
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 13
+            size: labelSize
           },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
+          color: labelColor,
+          anchor: labelAnchor,
+          align: labelAlign,
           formatter: (val) => `${suffix}${val}${prefix}`
         }
       },
       title: {
         display: true,
         text: chartType,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
+        fontColor: titleColor,
+        fontSize: titleSize,
+        position: titlePosition
       },
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
+            fontColor: typeColor,
+            padding: typePadding,
+            fontSize: typeSize,
           },
           gridLines: {
             display: false,
             drawBorder: false
           },
-          barThickness: 44,
+          barThickness,
         }],
         xAxes: [{
           ticks: {
@@ -64,7 +68,7 @@ const renderChart = (ctx, chartType, typeList, data, prefix, suffix = ``) => {
             display: false,
             drawBorder: false
           },
-          minBarLength: 50
+          minBarLength,
         }],
       },
       legend: {

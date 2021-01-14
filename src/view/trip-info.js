@@ -2,7 +2,6 @@ import {getFormatedDate} from '../utils/common';
 import {DateFormats, MAX_CITY_VISIBLE} from '../const';
 import AbstractView from './abstract';
 
-// Получаем маршрут путешествия
 const getTitleInfo = (pointsList) => {
 
   if (pointsList.length > MAX_CITY_VISIBLE) {
@@ -14,7 +13,6 @@ const getTitleInfo = (pointsList) => {
   return cities.join(` &mdash; `);
 };
 
-// Получаем дату начала и окончания путешествия
 const getDateInfo = (pointsList) => {
   const {MOUNTH: formateMounth, DAY: formateDay, MOUNTH_DAY: fomrmateMounthDay} = DateFormats;
   const startDate = pointsList[0].startDate;

@@ -2,7 +2,6 @@ import AbstractView from "./abstract";
 
 import {SortListDisable} from '../const';
 
-// Генерация разметки для типов сортировки точек
 const generateSortListTemplate = (sortList, currentSort) => {
   return sortList.reduce((result, type) => {
     const typeLowerCase = type.toLowerCase();

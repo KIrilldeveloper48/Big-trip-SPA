@@ -1,21 +1,19 @@
-import {ucFirst} from "../utils/common";
+import {TYPE_LIST, pointTypeResource} from "../const";
 
-// Генерация разметки для списка с типом путешествия
-export const generateTypesListTemplate = (typesList, currentType) => {
-  return typesList.reduce((result, type) => {
+export const generateTypesListTemplate = (currentType) => {
+  return TYPE_LIST.reduce((result, type) => {
 
     const isChecked = type === currentType ? `checked` : ``;
-    const formatedType = ucFirst(type);
+    const typeFromResource = pointTypeResource[type];
 
     result += `<div class="event__type-item">
                   <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
-                  <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${formatedType}</label>
+                  <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${typeFromResource}</label>
                 </div>`;
     return result;
   }, ``);
 };
 
-// Генерация разметки для списка городов
 export const generateCitiesListTemplate = (citiesList) => {
   return citiesList.length === 0
     ? ``
@@ -25,14 +23,13 @@ export const generateCitiesListTemplate = (citiesList) => {
     }, ``);
 };
 
-// Генерация разметки для списка доступных доп. опций конкретной точки
 export const generateOffersListTemplate = (offerList) => {
   if (offerList.length === 0) {
     return ``;
   }
   const offersListTemplate = offerList.reduce((result, offer) => {
     const isChecked = offer.checked ? `checked` : ``;
-    const offerName = offer.title.toLowerCase().replace(/ /g, `-`); // Первый параметр передаваемы в replace обозначает замену ВСЕХ подходящих подстрок (в нашем случае пробелов), а не только первое вхождение
+    const offerName = offer.title.toLowerCase().replace(/ /g, `-`);
     const offersListInputTemplate = `<input class="event__offer-checkbox  visually-hidden" 
                                       id="event-offer-${offerName}-1" type="checkbox" 
                                       name="event-offer-${offerName}" data-value="${offer.title}" ${isChecked}>`;
@@ -56,8 +53,6 @@ export const generateOffersListTemplate = (offerList) => {
           </section>`;
 };
 
-
-// Генерация разметки для описания точки
 export const generateDestinationTemplate = (photos, descr) => {
   if (photos.length === 0 && descr.length === 0) {
     return ``;

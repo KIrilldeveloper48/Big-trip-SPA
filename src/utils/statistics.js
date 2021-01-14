@@ -1,6 +1,5 @@
 import {getDurationInMinutes} from "./common";
-import {MINUTES_PER_DAY, CHART_DATA_TYPE} from "../const";
-
+import {CHART_DATA_TYPE, MINUTES_PER_DAY} from "../const";
 
 export const getTypesUniq = (points) => {
   const pointTypes = points.map((point)=> point.currentType.toUpperCase());
@@ -21,9 +20,9 @@ export const getChartsData = (typeList, points) => {
     [CHART_DATA_TYPE.TIME_SPEND]: timeSpendData
   };
 
-  return points.reduce((result, point) => {
+  points.reduce((result, point) => {
     const type = point.currentType.toUpperCase();
-    const durationInDay = Math.floor(getDurationInMinutes(point.startDate, point.endDate) / MINUTES_PER_DAY);
+    const durationInDay = getDurationInMinutes(point.startDate, point.endDate);
 
     moneyData[typeMap.get(type)] += point.cost;
     typeData[typeMap.get(type)]++;
@@ -31,5 +30,11 @@ export const getChartsData = (typeList, points) => {
 
     return result;
   }, chartsData);
+
+  chartsData[CHART_DATA_TYPE.TIME_SPEND] = chartsData[CHART_DATA_TYPE.TIME_SPEND].map((time) => {
+    return Math.floor(time / MINUTES_PER_DAY);
+  });
+
+  return chartsData;
 
 };

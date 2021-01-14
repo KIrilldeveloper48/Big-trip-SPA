@@ -72,7 +72,6 @@ export const getPointDestination = (city, destinations) => {
   return {descr, photos};
 };
 
-// Дата и длительность
 export const getFormatedDate = (date, format) => {
   return dayjs(date).format(format);
 };
