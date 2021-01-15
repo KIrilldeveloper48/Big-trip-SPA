@@ -32,7 +32,7 @@ class Menu extends AbstractView {
 
   removeMenuItemActive() {
     const menuItems = this.getElement().querySelectorAll(`A`);
-    for (let item of menuItems) {
+    for (const item of menuItems) {
       if (item.classList.contains(`trip-tabs__btn--active`)) {
         item.classList.remove(`trip-tabs__btn--active`);
       }

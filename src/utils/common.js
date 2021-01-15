@@ -25,7 +25,7 @@ export const getOffersForPoint = (currentOffers, offerList, type) => {
 
   return offersForType.map((offer) => {
 
-    for (let item of currentOffers) {
+    for (const item of currentOffers) {
 
       if (offer.title === item.title) {
         return Object.assign(
@@ -62,7 +62,7 @@ export const getPointDestination = (city, destinations) => {
   let descr = ``;
   let photos = [];
 
-  for (let item of destinations) {
+  for (const item of destinations) {
     if (item.name === city) {
       descr = item.description;
       photos = item.pictures;
