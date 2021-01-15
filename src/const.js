@@ -10,32 +10,32 @@ export const Keys = {
 };
 
 const PointType = {
-  "Taxi": `taxi`,
-  "Bus": `bus`,
-  "Train": `train`,
-  "Ship": `ship`,
-  "Transport": `transport`,
-  "Drive": `drive`,
-  "Flight": `flight`,
-  "Check-in": `check-in`,
-  "Sightseeing": `sightseeing`,
-  "Restaurant": `restaurant`
+  TAXI: `taxi`,
+  BUS: `bus`,
+  TRAIN: `train`,
+  SHIP: `ship`,
+  TRANSPORT: `transport`,
+  DRIVE: `drive`,
+  FLIGHT: `flight`,
+  CHECK_IN: `check-in`,
+  SIGHTSEEING: `sightseeing`,
+  RESTAURANT: `restaurant`
 };
 
 export const pointTypeResource = {
-  [PointType.Taxi]: `Taxi`,
-  [PointType.Bus]: `Bus`,
-  [PointType.Train]: `Train`,
-  [PointType.Ship]: `Ship`,
-  [PointType.Transport]: `Transport`,
-  [PointType.Drive]: `Drive`,
-  [PointType.Flight]: `Flight`,
-  [PointType[`Check-in`]]: `Check-in`,
-  [PointType.Sightseeing]: `Sightseeing`,
-  [PointType.Restaurant]: `Restaurant`,
+  [PointType.TAXI]: `Taxi`,
+  [PointType.BUS]: `Bus`,
+  [PointType.TRAIN]: `Train`,
+  [PointType.SHIP]: `Ship`,
+  [PointType.TRANSPORT]: `Transport`,
+  [PointType.DRIVE]: `Drive`,
+  [PointType.FLIGHT]: `Flight`,
+  [PointType.CHECK_IN]: `Check-in`,
+  [PointType.SIGHTSEEING]: `Sightseeing`,
+  [PointType.RESTAURANT]: `Restaurant`,
 };
 
-export const TYPE_LIST = [PointType.Taxi, PointType.Bus, PointType.Train, PointType.Ship, PointType.Transport, PointType.Drive, PointType.Flight, PointType[`Check-in`], PointType.Sightseeing, PointType.Restaurant];
+export const TYPE_LIST = [PointType.TAXI, PointType.BUS, PointType.TRAIN, PointType.SHIP, PointType.TRANSPORT, PointType.DRIVE, PointType.FLIGHT, PointType.CHECK_IN, PointType.SIGHTSEEING, PointType.RESTAURANT];
 
 export const MAX_CITY_VISIBLE = 3;
 
