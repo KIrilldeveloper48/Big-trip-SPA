@@ -62,7 +62,7 @@ class Trip {
     }
 
     if (this._pointsModel.getPoints().length === 0) {
-      this._renderNoPoint();
+      this.renderNoPoint();
     } else {
       this._renderHeaderInfo();
       this._renderSort();
@@ -79,8 +79,23 @@ class Trip {
   }
 
   createPoint(callback) {
+    if (this._noPointComponent !== null) {
+      remove(this._noPointComponent);
+      render(this._pointsContainer, this._eventsListComponent, RenderPosition.BEFOREEND);
+      this._pointNewPresenter.init(callback);
+      return;
+    }
+
     this._pointNewPresenter.init(callback);
   }
+
+  renderNoPoint() {
+    if (this._noPointComponent === null) {
+      this._noPointComponent = new Placeholder();
+    }
+    render(this._pointsContainer, this._noPointComponent, RenderPosition.BEFOREEND);
+  }
+
 
   _getPoints() {
     const filterType = this._filterModel.getFilter();
@@ -108,6 +123,7 @@ class Trip {
 
     if (this._sortComponent !== null) {
       remove(this._sortComponent);
+      this._sortComponent = null;
     }
     if (this._noPointComponent !== null) {
       remove(this._noPointComponent);
@@ -117,9 +133,25 @@ class Trip {
     }
   }
 
+  _clearSortAndHeader() {
+    if (this._sortComponent !== null) {
+      remove(this._sortComponent);
+      this._sortComponent = null;
+    }
+
+    if (this._headerInfoComponent !== null) {
+      remove(this._headerInfoComponent);
+      this._headerInfoComponent = null;
+    }
+
+    if (this._headerCostComponent !== null) {
+      remove(this._headerCostComponent);
+      this._headerCostComponent = null;
+    }
+  }
+
   _renderHeaderInfo() {
     const pointList = this._pointsModel.getPoints().slice().sort(sortDate);
-
     const prevHeaderInfoComponent = this._headerInfoComponent;
     const prevHeaderCostComponent = this._headerCostComponent;
 
@@ -144,10 +176,19 @@ class Trip {
   }
 
   _renderSort() {
+    const prevSortComponent = this._sortComponent;
     this._sortComponent = new SortView(SORT_LIST, this._currentSortType);
 
-    render(this._pointsContainer, this._sortComponent, RenderPosition.BEFOREEND);
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (prevSortComponent === null) {
+      render(this._pointsContainer, this._sortComponent, RenderPosition.BEFOREEND);
+      this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+      return;
+    } else {
+      replace(this._sortComponent, prevSortComponent);
+      this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+
+    }
+    remove(prevSortComponent);
   }
 
   _renderPoint(point) {
@@ -158,7 +199,6 @@ class Trip {
 
   _renderPoints() {
     const pointList = this._getPoints();
-
     render(this._pointsContainer, this._eventsListComponent, RenderPosition.BEFOREEND);
 
     pointList.forEach((point) => this._renderPoint(point));
@@ -173,25 +213,20 @@ class Trip {
     render(this._pointsContainer, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderNoPoint() {
-    this._noPointComponent = new Placeholder();
-    render(this._pointsContainer, this._noPointComponent, RenderPosition.BEFOREEND);
-  }
-
-  _renderListAndHeader() {
-    if (this._pointsModel.getPoints().length === 0) {
-      this._renderNoPoint();
-    } else {
-      this._renderHeaderInfo();
-      this._renderPoints();
-    }
-  }
-
   _renderListAndSort() {
     this._renderSort();
     this._renderPoints();
   }
 
+  _renderListAndHeader() {
+    if (this._pointsModel.getPoints().length === 0) {
+      this.renderNoPoint();
+      this._clearSortAndHeader();
+    } else {
+      this._renderHeaderInfo();
+      this._renderListAndSort();
+    }
+  }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
@@ -223,6 +258,7 @@ class Trip {
           .then((response) => {
             this._pointsModel.addPoint(updateType, response);
             this._pointNewPresenter.destroy();
+
           })
           .catch(() => {
             this._pointNewPresenter.setAborting();
@@ -231,7 +267,6 @@ class Trip {
 
       case UserAction.DELETE_POINT:
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
-
         this._api.deletePoint(update)
           .then(() => {
             this._pointsModel.deletePoint(updateType, update);
@@ -256,6 +291,7 @@ class Trip {
       case UpdateType.MAJOR:
         this._clearPointsList();
         this._renderListAndHeader();
+
         break;
       case UpdateType.INIT:
         this._isLoading = false;

@@ -1,12 +1,14 @@
 class Store {
-  constructor(key, storage) {
+  constructor(pointsKey, offersKey, destinationsKey, storage) {
     this._storage = storage;
-    this._storeKey = key;
+    this._storePointsKey = pointsKey;
+    this._storeOffersKey = offersKey;
+    this._storeDestinationsKey = destinationsKey;
   }
 
   getItems() {
     try {
-      return JSON.parse(this._storage.getItem(this._storeKey)) || {};
+      return JSON.parse(this._storage.getItem(this._storePointsKey)) || {};
     } catch (err) {
       return {};
     }
@@ -14,7 +16,7 @@ class Store {
 
   setItems(items) {
     this._storage.setItem(
-        this._storeKey,
+        this._storePointsKey,
         JSON.stringify(items)
     );
   }
@@ -23,7 +25,7 @@ class Store {
     const store = this.getItems();
 
     this._storage.setItem(
-        this._storeKey,
+        this._storePointsKey,
         JSON.stringify(
             Object.assign({}, store, {
               [key]: value
@@ -38,8 +40,38 @@ class Store {
     delete store[key];
 
     this._storage.setItem(
-        this._storeKey,
+        this._storePointsKey,
         JSON.stringify(store)
+    );
+  }
+
+  getOffers() {
+    try {
+      return JSON.parse(this._storage.getItem(this._storeOffersKey)) || {};
+    } catch (err) {
+      return {};
+    }
+  }
+
+  setOffers(offers) {
+    this._storage.setItem(
+        this._storeOffersKey,
+        JSON.stringify(offers)
+    );
+  }
+
+  getDestinations() {
+    try {
+      return JSON.parse(this._storage.getItem(this._storeDestinationsKey)) || {};
+    } catch (err) {
+      return {};
+    }
+  }
+
+  setDestinations(dest) {
+    this._storage.setItem(
+        this._storeDestinationsKey,
+        JSON.stringify(dest)
     );
   }
 

@@ -33,7 +33,6 @@ class PointNew {
     this._newPointComponent = new NewPointView(this._offerList, this._destinations);
     this._newPointComponent.setSubmitHandler(this._handleFormSubmit);
     this._newPointComponent.setCloseClickHandler(this._handleCancelClick);
-
     render(this._pointListContainer, this._newPointComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener(`keydown`, this._escKeyDownHandler);

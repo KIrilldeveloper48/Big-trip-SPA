@@ -19,11 +19,15 @@ import {FilterType, HiddenHeaderList, MenuItem, UpdateType} from './const';
 import {toast} from './utils/toast';
 
 
-const AUTORIZATION = `Basic i7ddr4g1080asus21131322`;
+const AUTORIZATION = `Basic i7ddr4g1080asus2`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
-const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_POINTS_PREFIX = `bigtrip-points-localstorage`;
+const STORE_OFFERS_PREFIX = `bigtrip-offers-localstorage`;
+const STORE_DESTINATION_PREFIX = `bigtrip-destinations-localstorage`;
 const STORE_VER = `v1`;
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const STORE_POINTS_NAME = `${STORE_POINTS_PREFIX}-${STORE_VER}`;
+const STORE_OFFERS_NAME = `${STORE_OFFERS_PREFIX}-${STORE_VER}`;
+const STORE_DESTINATIONS_NAME = `${STORE_DESTINATION_PREFIX}-${STORE_VER}`;
 
 const siteMainElement = document.querySelector(`.page-body`);
 const tripControlsElement = siteMainElement.querySelector(`.trip-controls`);
@@ -31,7 +35,7 @@ const mainHeaderElement = siteMainElement.querySelector(`.trip-main`);
 const pointListElement = siteMainElement.querySelector(`.trip-events`);
 
 const api = new Api(END_POINT, AUTORIZATION);
-const store = new Store(STORE_NAME, window.localStorage);
+const store = new Store(STORE_POINTS_NAME, STORE_OFFERS_NAME, STORE_DESTINATIONS_NAME, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
 const pointsModel = new PointsModel();
@@ -48,6 +52,11 @@ const tripPresenter = new Trip(siteMainElement, pointsModel, filterModel, apiWit
 const handlePointNewFormClose = () => {
   menuComponent.setMenuItem(MenuItem.TABLE);
   NewPointBtnComponent.getElement().disabled = false;
+
+  if (pointsModel.getPoints().length === 0) {
+    tripPresenter.renderNoPoint();
+  }
+
 };
 
 let statisticsComponent = null;
@@ -99,7 +108,7 @@ const handleSiteMenuClick = (menuItem) => {
 tripPresenter.init();
 filterPresenter.init();
 
-Promise.all([api.getOffers(), api.getDestinations(), apiWithProvider.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
+Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), apiWithProvider.getPoints()]).then(([offers = [], destinations = [], points = []]) => {
   pointsModel.setOffers(offers);
   pointsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);

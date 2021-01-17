@@ -35,6 +35,30 @@ class Provider {
     return Promise.resolve(storePoints.map(PointsModel.adaptToClient));
   }
 
+
+  getOffers() {
+    if (isOnline()) {
+      return this._api.getOffers()
+        .then((offers) => {
+          this._store.setOffers(offers);
+          return offers;
+        });
+    }
+    const storeOffers = Object.entries(this._store.getOffers()).map(([type, offers]) => Object.assign({}, {offers, type}));
+    return Promise.resolve(PointsModel.adaptOffersToClient(storeOffers));
+  }
+
+  getDestinations() {
+    if (isOnline()) {
+      return this._api.getDestinations()
+        .then((dest) => {
+          this._store.setDestinations(dest);
+          return dest;
+        });
+    }
+    return this._store.getDestinations();
+  }
+
   updatePoint(point) {
     if (isOnline()) {
       return this._api.updatePoint(point)
