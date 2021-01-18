@@ -19,7 +19,7 @@ import {FilterType, HiddenHeaderList, MenuItem, UpdateType} from './const';
 import {toast} from './utils/toast';
 
 
-const AUTORIZATION = `Basic i7ddr4g1080asus2`;
+const AUTORIZATION = `Basic i7ddr4g1080asus212`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const STORE_POINTS_PREFIX = `bigtrip-points-localstorage`;
 const STORE_OFFERS_PREFIX = `bigtrip-offers-localstorage`;
@@ -135,6 +135,10 @@ Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), api
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`);
+
+  if (!isOnline()) {
+    document.title += ` [offline]`;
+  }
 });
 
 window.addEventListener(`online`, () => {
@@ -145,3 +149,5 @@ window.addEventListener(`online`, () => {
 window.addEventListener(`offline`, () => {
   document.title += ` [offline]`;
 });
+
+
