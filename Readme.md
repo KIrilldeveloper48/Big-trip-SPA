@@ -1,52 +1,24 @@
-# Проект «Большое путешествие» [![Build status][travis-image]][travis-url]
+<h1 align="center">"Большое путешествие"</h1>
 
-* Студент: [Кирилл Попов](https://up.htmlacademy.ru/ecmascript/13/user/1331853).
-* Наставник: `Алексей Михеев`.
+<p align="center">
 
----
+<img src="https://img.shields.io/badge/made%20by-KIrilldeveloper48-blue.svg" >
+<img src="https://img.shields.io/github/languages/top/KIrilldeveloper48/Six-cities-SPA-React.svg">
 
-_Не удаляйте и не изменяйте папки и файлы:_
-_`.editorconfig`, `.gitattributes`, `.travis.yml`._
+</p>
 
----
-
-### Памятка
-
-#### 1. Зарегистрируйтесь на Гитхабе
-
-Если у вас ещё нет аккаунта на [github.com](https://github.com/join), скорее зарегистрируйтесь.
-
-#### 2. Создайте форк
-
-Откройте репозиторий и нажмите кнопку «Fork» в правом верхнем углу. Репозиторий из Академии будет скопирован в ваш аккаунт.
-
-<img width="769" alt="Press 'Fork'" src="https://cloud.githubusercontent.com/assets/259739/20264045/a1ddbf40-aa7a-11e6-9a1a-724a1c0123c8.png">
-
-Получится вот так:
-
-<img width="769" alt="Forked" src="https://cloud.githubusercontent.com/assets/259739/20264122/f63219a6-aa7a-11e6-945a-89818fc7c014.png">
-
-#### 3. Клонируйте репозиторий на свой компьютер
-
-Будьте внимательны: нужно клонировать свой репозиторий (форк), а не репозиторий Академии. Также обратите внимание, что клонировать репозиторий нужно через SSH, а не через HTTPS. Нажмите зелёную кнопку в правой части экрана, чтобы скопировать SSH-адрес вашего репозитория:
-
-<img width="769" alt="SSH" src="https://cloud.githubusercontent.com/assets/259739/20264180/42704126-aa7b-11e6-9ab4-73372b812a53.png">
-
-Клонировать репозиторий можно так:
-
-```
-git clone SSH-адрес_вашего_форка
-```
-
-Команда клонирует репозиторий на ваш компьютер и подготовит всё необходимое для старта работы.
-
-#### 4. Начинайте обучение!
+Современный сервис для настоящих путешественников. Сервис помогает детально спланировать маршрут поездки, рассчитать стоимость путешествия и получить информацию о достопримечательностях. Минималистичный интерфейс не даст повода отвлечься и сфокусирует внимание на планировании путешествия.
 
 ---
+<p align="center">
+<img src="https://i.ibb.co/3Sx7h60/2021-04-14-13-50-51-100.gif" width="80%">
+<img src="https://i.ibb.co/pWWVxmQ/2021-04-14-14-43-03-257.gif" width="80%">
+</p>
 
-<a href="https://htmlacademy.ru/intensive/ecmascript"><img align="left" width="50" height="50" title="HTML Academy" src="https://up.htmlacademy.ru/static/img/intensive/ecmascript/logo-for-github.svg"></a>
+# Как пользоваться
 
-Репозиторий создан для обучения на профессиональном курсе «[JavaScript. Архитектура клиентских приложений](https://htmlacademy.ru/intensive/ecmascript)» от [HTML Academy](https://htmlacademy.ru).
+1. Скачать архив с проектом и распаковать
+2. Открыть терминал и перейти в папку с распакованным проектом
+3. Ввести в терминале следующие команды: `npm i` для установки необходимых пакетов, а затем `npm start` для запуска проекта
 
-[travis-image]: https://travis-ci.com/htmlacademy-ecmascript/1331853-big-trip-13.svg?branch=master
-[travis-url]: https://travis-ci.com/htmlacademy-ecmascript/1331853-big-trip-13
+В браузере откроется вкладка с проектом
