@@ -3,8 +3,6 @@
 <p align="center">
 
 <img src="https://img.shields.io/badge/made%20by-KIrilldeveloper48-blue.svg" >
-<img src="https://img.shields.io/github/languages/top/KIrilldeveloper48/Six-cities-SPA-React.svg">
-
 </p>
 
 Современный сервис для настоящих путешественников. Сервис помогает детально спланировать маршрут поездки, рассчитать стоимость путешествия и получить информацию о достопримечательностях. Минималистичный интерфейс не даст повода отвлечься и сфокусирует внимание на планировании путешествия.
@@ -12,6 +10,9 @@
 ---
 <p align="center">
 <img src="https://i.ibb.co/3Sx7h60/2021-04-14-13-50-51-100.gif" width="80%">
+</p>
+
+<p align="center">
 <img src="https://i.ibb.co/pWWVxmQ/2021-04-14-14-43-03-257.gif" width="80%">
 </p>
 
